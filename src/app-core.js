@@ -71,7 +71,7 @@ function winAnsiBytes(str) {
 
 /* --------------------------------------------------------------- 状态定义 */
 const DEFAULTS = {
-  content: 'https://wealth.slashbro.top/',
+  content: 'https://slashbro.top/',
   ecc: 'H',
   version: 0,
   quiet: 4,
