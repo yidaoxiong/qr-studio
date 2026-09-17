@@ -3,7 +3,8 @@
 带 **中心 Logo**（方形 / 长方形 / 圆形）与 **多语言文字说明** 的二维码生成器。
 纯前端单文件，离线可用；云端保存走 Cloudflare Pages + KV。
 
-线上：**https://qrcode.slashbro.top**
+线上：**https://qrcode.slashbro.top**（边缘入口见下文「域名入口」一节）
+备用：**https://qr-studio-5rx.pages.dev**
 
 ## 能做什么
 
@@ -32,6 +33,9 @@ src/
 public/
   index.html          构建产物（部署入口，也可直接双击打开）
   _worker.js          Pages Worker：/api/qr* 云端接口
+edge/
+  index.js            边缘入口 Worker：把 qrcode.slashbro.top 转发到 Pages 站点
+  wrangler.toml       Worker 配置（只做转发，无存储绑定）
 lib/
   qrcode-generator.js 二维码编码（MIT, Kazuhiko Arase）
   jsqr.min.js         解码器，用于页面内自检
@@ -39,17 +43,48 @@ schema.sql            D1 建表语句
 wrangler.toml         Pages 配置：输出目录 public + D1 / KV 绑定
 ```
 
+## 域名入口为什么要单独一层 Worker
+
+站点的**正文**（静态资源 + `/api/qr*`）全部跑在 Pages 项目 `qr-studio` 上，
+推送 `main` 分支自动部署，这套流程不受影响。
+
+但本账号的 wrangler OAuth 令牌**没有 `dns_records` 权限**：在 Pages 里添加自定义域名
+只会建到 `pending`，CNAME 记录不会自动创建（`"CNAME record not set"`）。
+而 **Workers 自定义域名**这条路是令牌允许的 —— Cloudflare 会自动创建 DNS 记录与证书
+（账号里 `time` / `dinosaur-run` / `helicopter` / `slashpack` 四个域名都是这么来的）。
+
+所以拆成：**Pages 负责内容与自动部署，`edge/` 这个 25 行的 Worker 只负责把域名接进来**。
+
+```
+qrcode.slashbro.top → qr-studio-edge (Worker，纯转发) → qr-studio-5rx.pages.dev (Pages)
+```
+
+已验证：两边的首页响应**字节级一致**（SHA256 相同），`/`、`/api/qr`、`/api/qr/:id`、
+未知路径的状态码（200/404）逐条对齐，POST/DELETE 带 body 的请求正常穿透。
+
+### 想换成零层级的直连（可选）
+
+如果更希望 `qrcode.slashbro.top` 直接指向 Pages、不要中间这一跳：
+
+1. Cloudflare 面板 → `slashbro.top` → DNS → 添加
+   `CNAME  qrcode → qr-studio-5rx.pages.dev`（已代理）
+2. 删除 Workers 自定义域名绑定（面板 Workers → qr-studio-edge → Settings → Domains & Routes）
+3. Pages 项目 → Custom domains → 重新添加 `qrcode.slashbro.top`
+4. 删掉本仓库的 `edge/` 目录
+
 ## 开发与部署
 
 ```bash
 node build.js                                   # 构建
 npx wrangler pages dev                          # 本地起 Pages（含 /api 接口、本地 D1/KV）
 npx wrangler d1 execute qr-studio-db --local  --file=schema.sql   # 本地建表
-npx wrangler pages deploy                       # 手动部署
+npx wrangler pages deploy                       # 手动部署 Pages
+cd edge && npx wrangler deploy                  # 部署边缘入口 Worker（仅改 edge/ 时才需要）
 ```
 
 仓库连接到 Cloudflare Pages 的 `main` 分支后，推送即自动部署。
 Pages 读取仓库内的 `wrangler.toml` 得到输出目录与 D1 / KV 绑定。
+`edge/` 目录不在 Pages 的构建范围内，与 Pages 的自动部署互不干扰。
 
 ## 云端接口
 

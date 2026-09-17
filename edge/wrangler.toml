@@ -1,0 +1,6 @@
+name = "qr-studio-edge"
+main = "index.js"
+compatibility_date = "2026-08-01"
+
+# 只做域名入口转发，不需要任何存储绑定。
+# 站点正文与 /api/qr* 全部在 Pages 项目 qr-studio 上（见仓库根 wrangler.toml）。
