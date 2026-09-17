@@ -91,8 +91,8 @@ const DEFAULTS = {
   logoShape: 'round',
   logoPlate: true,
 
-  title: '扫码查看儿童记账',
-  subtitle: 'Scannen · Escanear · Scannen · スキャン',
+  title: '',
+  subtitle: '',
   fontId: 'helv',
   titleSize: 22,
   subSize: 14,
