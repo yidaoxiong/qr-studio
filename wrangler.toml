@@ -2,6 +2,13 @@ name = "qr-studio"
 compatibility_date = "2026-08-01"
 pages_build_output_dir = "public"
 
+# 索引与元数据：需要强一致，保存后要立刻出现在列表里 → D1
+[[d1_databases]]
+binding = "qr_studio_db"
+database_name = "qr-studio-db"
+database_id = "5a3f5d73-5767-4114-b96b-bfc9d4e65b11"
+
+# 大对象（PNG 文件 / Logo 原图）：体积远超 D1 的语句上限 → KV
 [[kv_namespaces]]
 binding = "QR_KV"
 id = "06eb47e783eb4e0792d20cf5a5072ba8"

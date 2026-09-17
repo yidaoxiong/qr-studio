@@ -35,30 +35,43 @@ public/
 lib/
   qrcode-generator.js 二维码编码（MIT, Kazuhiko Arase）
   jsqr.min.js         解码器，用于页面内自检
-wrangler.toml         Pages 配置：输出目录 public + KV 绑定 QR_KV
+schema.sql            D1 建表语句
+wrangler.toml         Pages 配置：输出目录 public + D1 / KV 绑定
 ```
 
 ## 开发与部署
 
 ```bash
-node build.js                       # 构建
-npx wrangler pages dev              # 本地起 Pages（含 /api 接口与本地 KV）
-npx wrangler pages deploy           # 手动部署
+node build.js                                   # 构建
+npx wrangler pages dev                          # 本地起 Pages（含 /api 接口、本地 D1/KV）
+npx wrangler d1 execute qr-studio-db --local  --file=schema.sql   # 本地建表
+npx wrangler pages deploy                       # 手动部署
 ```
 
 仓库连接到 Cloudflare Pages 的 `main` 分支后，推送即自动部署。
-Pages 读取仓库内的 `wrangler.toml` 得到输出目录与 KV 绑定。
+Pages 读取仓库内的 `wrangler.toml` 得到输出目录与 D1 / KV 绑定。
 
 ## 云端接口
 
 | 方法 | 路径 | 说明 |
 | --- | --- | --- |
 | GET | `/api/qr` | 列表（含缩略图） |
-| POST | `/api/qr` | 新建；带 `id` 则覆盖该条目 |
+| POST | `/api/qr` | 新建；带 `id` 则覆盖该条目（不带 `png` 则沿用旧文件） |
 | GET | `/api/qr/:id` | 取单条完整内容（含 PNG 与配方） |
 | DELETE | `/api/qr/:id` | 删除 |
 
 上限 20 条，服务端强制；超出返回 `409 limit_reached:20`。
+
+### 为什么索引放 D1、文件放 KV
+
+一开始索引和文件都放 KV，结果**保存完刷新列表看不到刚存的东西**：KV 的
+`list()` 写入后要十几秒才可见（实测 ~15~20s），而按 key 直读是立刻可见的。
+
+所以拆成两层：
+
+- **D1** 存索引与元数据（id / 名称 / 时间 / 尺寸 / 配方 / 缩略图）—— 强一致，存完立刻出现在列表里
+- **KV** 存 PNG 文件与 Logo 原图 —— 体积可达几百 KB，超过 D1 的 SQL 语句上限；
+  而且只在点「载入 / PNG」时按 id 直读，不涉及 `list()`
 
 ## 两个已修复的坑（踩过，留个记录）
 

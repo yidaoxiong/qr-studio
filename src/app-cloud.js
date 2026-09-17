@@ -108,6 +108,7 @@ async function cloudSave() {
       thumb,
       w: cv.width,
       h: cv.height,
+      bytes: dataUrlBytes(png),
     };
     const out = await cloudFetch(CLOUD_API, {
       method: 'POST',
