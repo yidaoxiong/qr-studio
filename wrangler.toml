@@ -1,0 +1,7 @@
+name = "qr-studio"
+compatibility_date = "2026-08-01"
+pages_build_output_dir = "public"
+
+[[kv_namespaces]]
+binding = "QR_KV"
+id = "06eb47e783eb4e0792d20cf5a5072ba8"
