@@ -11,6 +11,10 @@ if (typeof qrcode !== 'undefined' && qrcode.stringToBytesFuncs && qrcode.stringT
   qrcode.stringToBytes = qrcode.stringToBytesFuncs['UTF-8'];
 }
 
+/* ------------------------------------------------------------------ 版本 */
+/* 版本号由构建脚本注入（build.js 里的 APP_VERSION 是唯一出处） */
+const APP_VERSION = '/*__APP_VERSION__*/';
+
 /* ------------------------------------------------------------------ 字体表 */
 /* cat 用于 PDF 标准字体映射；css 为跨平台回退栈，末尾带 CJK 兜底 */
 const FONTS = [

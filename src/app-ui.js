@@ -480,6 +480,7 @@ function copyPng() {
 function init() {
   buildFontSelect();
   buildVersionSelect();
+  $('appVersion').textContent = 'v' + APP_VERSION;
   syncUI();
   bindInputs();
   $('fontSample').style.fontFamily = fontById(state.fontId).css;

@@ -22,7 +22,11 @@
 ## 目录结构
 
 ```
-build.js              合并 src/ + lib/ → public/index.html
+build.js              合并 src/ + lib/ → public/index.html（注入品牌图标与版本号）
+assets/
+  slashbro-icon.png       开发者图标原图（1024×1024，取自 slashbro.top）
+  slashbro-icon-128.png   顶栏用
+  slashbro-icon-64.png    标签页 favicon 用
 src/
   index.html          页面骨架（含 /*__CSS__*/ 等占位符）
   app.css             样式
@@ -42,6 +46,23 @@ lib/
 schema.sql            D1 建表语句
 wrangler.toml         Pages 配置：输出目录 public + D1 / KV 绑定
 ```
+
+## 版本号与品牌
+
+**版本号只有一个出处**：`build.js` 顶部的 `APP_VERSION`。构建时注入到两处 ——
+顶栏徽标和 `src/app-core.js` 里的 `APP_VERSION` 常量。改版本只改 build.js 一行，不会漂移。
+
+**品牌图标**同样在构建时内联成 dataURL（顶栏用 128px、标签页用 64px）,
+所以**单文件离线版也带着图标**，不依赖外部资源。原图放在 `assets/`，
+需要换图标就替换 `assets/slashbro-icon.png` 后重新生成各尺寸：
+
+```bash
+cd assets
+for S in 64 128; do sips -z $S $S slashbro-icon.png --out slashbro-icon-$S.png; done
+cd .. && node build.js
+```
+
+图标本身是**透明底的圆形标**，CSS 里不需要再套圆角或底色。
 
 ## 域名入口为什么要单独一层 Worker
 
