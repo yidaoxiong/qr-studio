@@ -483,11 +483,13 @@ function t(key, params) {
   return s;
 }
 
-/** 把 [data-i18n] / [data-i18n-ph] / [data-i18n-title] 填进去 */
+/** 把 [data-i18n] / [data-i18n-html] / [data-i18n-ph] / [data-i18n-title] 填进去 */
 function applyStaticText() {
   document.documentElement.lang = HTML_LANG[LANG] || 'en';
   document.title = t('docTitle');
   document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
+  // 文案里带 <b> 等标记的用这个（只有我们自己的字典会进来，不是用户输入）
+  document.querySelectorAll('[data-i18n-html]').forEach(el => { el.innerHTML = t(el.dataset.i18nHtml); });
   document.querySelectorAll('[data-i18n-ph]').forEach(el => { el.placeholder = t(el.dataset.i18nPh); });
   document.querySelectorAll('[data-i18n-title]').forEach(el => { el.title = t(el.dataset.i18nTitle); });
 }

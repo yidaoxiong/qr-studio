@@ -5,30 +5,64 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>QR Logo Studio · 带 Logo 与文字说明的二维码生成器</title>
 <link rel="icon" type="image/png" href="data:image/png;base64,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">
-<style>*, *::before, *::after { box-sizing: border-box; }
+<style>/* =========================================================================
+ * QR Logo Studio · 界面主题
+ * 设计语言取自 design.slashbro.top/#brand=clay
+ *   奶油底 #fffaf0 · 近黑主按钮 #0a0a0a · 亮粉点缀 #ff4d8b
+ *   Inter 风重标题（紧字距）· 20px 圆角卡片 · 胶囊按钮 · 大量留白
+ * ========================================================================= */
+*, *::before, *::after { box-sizing: border-box; }
 :root {
-  --bg: #f6f7f9;
+  /* 画布与面板 */
+  --bg: #fffaf0;            /* Clay：奶油色画布，区别于冷灰的竞品站 */
   --panel: #ffffff;
-  --line: #e4e7ec;
-  --line-strong: #d0d5dd;
-  --text: #101828;
-  --muted: #667085;
-  --accent: #4f46e5;
-  --accent-soft: #eef2ff;
-  --ok: #12805c;
-  --ok-soft: #e9f7f1;
-  --warn: #b54708;
-  --warn-soft: #fef4e6;
-  --bad: #b42318;
-  --bad-soft: #fdecea;
-  --radius: 12px;
-  --shadow: 0 1px 2px rgba(16, 24, 40, .06), 0 1px 3px rgba(16, 24, 40, .04);
+  --surface: #faf5e8;       /* Clay surface */
+  --tint: #fdfbf5;          /* 比 surface 更浅，做输入区/缩略图底 */
+
+  /* 线 */
+  --line: #f0f0f0;          /* hairline-soft */
+  --line-strong: #e5e5e5;   /* hairline */
+  --line-warm: #e2ded2;     /* 偶尔需要比 hairline 深一档的暖灰 */
+
+  /* 文字 */
+  --text: #0a0a0a;          /* ink */
+  --body: #3a3a3a;
+  --muted: #6a6a6a;
+  --muted-soft: #9a9a9a;
+
+  /* 主操作 = 近黑（Clay 的 CTA 就是黑的） */
+  --accent: #0a0a0a;
+  --accent-hover: #1f1f1f;
+  --accent-soft: #f4f1e8;
+
+  /* 品牌电压 = 亮粉，只做点缀 */
+  --pink: #ff4d8b;
+  --pink-deep: #d6336c;
+  --pink-soft: #ffeaf1;
+
+  /* 状态色：取 Clay 六色卡里的深青 / 赭石 / 玫红 */
+  --ok: #0f766e;
+  --ok-soft: #e7f4f1;
+  --ok-line: #c6e3dd;
+  --warn: #b45309;
+  --warn-soft: #fdf3e3;
+  --warn-line: #f3e0c1;
+  --bad: #d6336c;
+  --bad-soft: #ffeaf1;
+  --bad-line: #f8cddd;
+
+  --radius: 20px;           /* Clay card radius */
+  --radius-btn: 9999px;     /* Clay button radius = 胶囊 */
+  --radius-field: 10px;
+  --shadow: 0 1px 2px rgba(23, 23, 19, .05), 0 1px 3px rgba(23, 23, 19, .04);
+  --shadow-lift: 0 6px 24px rgba(23, 23, 19, .10);
 }
 html, body { margin: 0; padding: 0; }
 body {
   background: var(--bg);
   color: var(--text);
-  font: 14px/1.5 -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+  font: 14px/1.5 Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+        "Segoe UI", "PingFang SC", "Helvetica Neue", Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -36,27 +70,28 @@ body {
 .topbar {
   position: sticky; top: 0; z-index: 20;
   display: flex; align-items: center; justify-content: space-between; gap: 16px;
-  padding: 12px 22px; background: rgba(255, 255, 255, .86);
+  padding: 12px 22px; background: rgba(255, 250, 240, .88);
   backdrop-filter: saturate(180%) blur(12px);
-  border-bottom: 1px solid var(--line);
+  border-bottom: 1px solid var(--line-warm);
 }
 .brand { display: flex; align-items: baseline; gap: 10px; }
 .brand-icon { width: 26px; height: 26px; align-self: center; display: block; flex: 0 0 auto; }
-.brand h1 { font-size: 16px; margin: 0; letter-spacing: -.01em; }
+.brand h1 { font-size: 17px; margin: 0; font-weight: 700; letter-spacing: -.02em; }
 /* 品牌图标本身是透明底的圆形标，不需要再套圆角或底色 */
 .brand .ver {
-  font-size: 11px; font-weight: 600; color: var(--accent);
-  background: var(--accent-soft); border: 1px solid #dbd7fb;
-  padding: 1px 7px; border-radius: 999px; align-self: center;
-  font-variant-numeric: tabular-nums; line-height: 1.7; white-space: nowrap;
+  font-size: 11px; font-weight: 700; color: #fff; letter-spacing: .02em;
+  background: var(--pink); border: 0;
+  padding: 2px 9px; border-radius: var(--radius-btn); align-self: center;
+  font-variant-numeric: tabular-nums; line-height: 1.6; white-space: nowrap;
 }
-.brand .tag { font-size: 12px; color: var(--muted); }
+.brand .tag { font-size: 12px; color: var(--muted); letter-spacing: .01em; }
 .topbar-actions { display: flex; gap: 8px; align-items: center; }
 
 /* 语言选择 */
 .lang-sel {
-  width: auto; min-width: 96px; padding: 5px 8px; font-size: 12px;
-  border-radius: 8px; border: 1px solid var(--line-strong); background: #fff; cursor: pointer;
+  width: auto; min-width: 96px; padding: 6px 10px; font-size: 12px;
+  border-radius: var(--radius-btn); border: 1px solid var(--line-strong);
+  background: var(--panel); cursor: pointer; color: var(--text);
 }
 
 /* ---------- 布局 ---------- */
@@ -69,77 +104,83 @@ body {
 
 /* ---------- 卡片 ---------- */
 .card {
-  background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
-  padding: 16px; box-shadow: var(--shadow); min-width: 0;
+  background: var(--panel); border: 1px solid var(--line-strong); border-radius: var(--radius);
+  padding: 18px; box-shadow: var(--shadow); min-width: 0;
 }
-.card > h2 { font-size: 13px; font-weight: 600; margin: 0 0 12px; color: var(--text); }
+.card > h2 { font-size: 13px; font-weight: 700; margin: 0 0 12px; color: var(--text); letter-spacing: -.005em; }
 .card > h2:only-child { margin-bottom: 0; }
-h2 em { font-style: normal; font-weight: 400; color: var(--muted); font-size: 12px; }
+h2 em { font-style: normal; font-weight: 400; color: var(--muted-soft); font-size: 12px; }
 
 /* ---------- 表单 ---------- */
-.row { display: flex; gap: 12px; align-items: flex-start; margin-top: 12px; }
+.row { display: flex; gap: 12px; align-items: flex-start; margin-top: 14px; }
 .row.wrap { flex-wrap: wrap; }
 .field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
 .field.grow { flex: 1 1 0; }
 .field .label { font-size: 12px; color: var(--muted); display: flex; align-items: baseline; gap: 6px; }
-.field .label b { color: var(--text); font-weight: 600; font-variant-numeric: tabular-nums; }
-.field .label em { font-style: normal; font-size: 11px; color: #98a2b3; }
+.field .label b { color: var(--text); font-weight: 700; font-variant-numeric: tabular-nums; }
+.field .label em { font-style: normal; font-size: 11px; color: var(--muted-soft); }
 .self-end { align-self: flex-end; }
 input[type="text"], input[type="url"], input[type="number"], textarea, select {
-  width: 100%; padding: 8px 10px; font: inherit; color: var(--text);
-  background: #fff; border: 1px solid var(--line-strong); border-radius: 8px; outline: none;
+  width: 100%; padding: 8px 11px; font: inherit; color: var(--text);
+  background: #fff; border: 1px solid var(--line-strong); border-radius: var(--radius-field); outline: none;
 }
 textarea { resize: vertical; font-family: ui-monospace, Menlo, monospace; font-size: 13px; }
 input[type="text"]:focus, input[type="url"]:focus, input[type="number"]:focus, textarea:focus, select:focus {
-  border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft);
+  border-color: var(--pink); box-shadow: 0 0 0 3px rgba(255, 77, 139, .16);
 }
 input[type="color"] {
   width: 100%; height: 34px; padding: 3px; background: #fff;
-  border: 1px solid var(--line-strong); border-radius: 8px; cursor: pointer;
+  border: 1px solid var(--line-strong); border-radius: var(--radius-field); cursor: pointer;
 }
 input[type="range"] { width: 100%; -webkit-appearance: none; height: 20px; background: transparent; cursor: pointer; }
-input[type="range"]::-webkit-slider-runnable-track { height: 4px; border-radius: 2px; background: #e4e7ec; }
+input[type="range"]::-webkit-slider-runnable-track { height: 4px; border-radius: 999px; background: var(--line-warm); }
 input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none; width: 15px; height: 15px; margin-top: -5.5px;
+  -webkit-appearance: none; width: 16px; height: 16px; margin-top: -6px;
   border-radius: 50%; background: #fff; border: 2px solid var(--accent);
-  box-shadow: 0 1px 3px rgba(16, 24, 40, .2);
+  box-shadow: 0 1px 3px rgba(23, 23, 19, .22);
 }
-.check { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--muted); margin-top: 12px; }
+.check { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--muted); margin-top: 14px; }
 .check input { accent-color: var(--accent); }
 
-/* ---------- 按钮 ---------- */
+/* ---------- 按钮：胶囊（Clay button radius = 9999px） ---------- */
 button {
-  font: inherit; cursor: pointer; border-radius: 8px; padding: 7px 12px;
-  border: 1px solid var(--line-strong); background: #fff; color: var(--text);
-  transition: background .12s, border-color .12s, transform .06s;
+  font: inherit; cursor: pointer; border-radius: var(--radius-btn); padding: 7px 14px;
+  border: 1px solid var(--line-strong); background: var(--panel); color: var(--text);
+  transition: background .12s, border-color .12s, color .12s, transform .06s;
 }
-button:hover { background: #f9fafb; }
+button:hover { background: var(--surface); }
 button:active { transform: translateY(1px); }
-button.primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 500; }
-button.primary:hover { background: #4338ca; }
-button.ghost { background: #fff; }
-button.sm { padding: 5px 10px; font-size: 12px; }
-.chip { font-size: 12px; padding: 5px 10px; border-radius: 999px; color: var(--muted); background: #fff; }
-.chip:hover { color: var(--accent); border-color: var(--accent); }
-.segmented { display: flex; border: 1px solid var(--line-strong); border-radius: 8px; overflow: hidden; background: #fff; }
-.segmented button { flex: 1; border: 0; border-right: 1px solid var(--line); border-radius: 0; font-size: 12px; padding: 7px 4px; color: var(--muted); }
-.segmented button:last-child { border-right: 0; }
-.segmented button.on { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
-.link { color: var(--accent); cursor: pointer; text-decoration: underline; }
+button.primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
+button.primary:hover { background: var(--accent-hover); }
+button.ghost { background: var(--panel); }
+button.sm { padding: 5px 12px; font-size: 12px; }
+.chip {
+  font-size: 12px; padding: 5px 12px; border-radius: var(--radius-btn);
+  color: var(--muted); background: var(--panel);
+}
+.chip:hover { color: var(--text); border-color: var(--accent); }
+.segmented {
+  display: flex; border: 1px solid var(--line-strong); border-radius: var(--radius-btn);
+  overflow: hidden; background: var(--panel); padding: 2px; gap: 2px;
+}
+.segmented button { flex: 1; border: 0; border-radius: var(--radius-btn); font-size: 12px; padding: 6px 4px; color: var(--muted); background: transparent; }
+.segmented button:hover { background: var(--surface); color: var(--text); }
+.segmented button.on { background: var(--accent); color: #fff; font-weight: 600; }
+.link { color: var(--pink-deep); cursor: pointer; text-decoration: underline; }
 
 /* ---------- Logo 拖放 ---------- */
 .drop {
-  position: relative; border: 1.5px dashed var(--line-strong); border-radius: 10px;
-  padding: 14px; text-align: center; background: #fcfcfd; transition: .15s;
+  position: relative; border: 1.5px dashed var(--line-warm); border-radius: 14px;
+  padding: 14px; text-align: center; background: var(--tint); transition: .15s;
 }
-.drop.over { border-color: var(--accent); background: var(--accent-soft); }
+.drop.over { border-color: var(--pink); background: var(--pink-soft); }
 .drop-inner { font-size: 12px; color: var(--muted); display: flex; flex-direction: column; gap: 3px; }
-.drop-inner small { color: #98a2b3; }
+.drop-inner small { color: var(--muted-soft); }
 #logoThumb { display: block; max-width: 100%; max-height: 84px; margin: 0 auto; object-fit: contain; }
 
 .fontsample {
-  margin-top: 8px; padding: 9px 11px; border: 1px solid var(--line); border-radius: 8px;
-  background: #fcfcfd; color: var(--muted); font-size: 13px; overflow-wrap: anywhere;
+  margin-top: 8px; padding: 9px 11px; border: 1px solid var(--line); border-radius: var(--radius-field);
+  background: var(--tint); color: var(--muted); font-size: 13px; overflow-wrap: anywhere;
 }
 
 /* ---------- 预览 ---------- */
@@ -147,73 +188,73 @@ button.sm { padding: 5px 10px; font-size: 12px; }
 .preview-head h2 { margin: 0; }
 .preview-meta { font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; text-align: right; }
 .canvas-wrap {
-  display: flex; justify-content: center; align-items: center; padding: 14px; border-radius: 10px;
+  display: flex; justify-content: center; align-items: center; padding: 14px; border-radius: 14px;
   background:
-    linear-gradient(45deg, #f1f2f4 25%, transparent 25%, transparent 75%, #f1f2f4 75%) 0 0 / 16px 16px,
-    linear-gradient(45deg, #f1f2f4 25%, transparent 25%, transparent 75%, #f1f2f4 75%) 8px 8px / 16px 16px,
-    #fafafa;
+    linear-gradient(45deg, #f1efe7 25%, transparent 25%, transparent 75%, #f1efe7 75%) 0 0 / 16px 16px,
+    linear-gradient(45deg, #f1efe7 25%, transparent 25%, transparent 75%, #f1efe7 75%) 8px 8px / 16px 16px,
+    var(--tint);
   min-height: 260px;
 }
-#preview { max-width: 100%; height: auto; border-radius: 6px; box-shadow: 0 6px 24px rgba(16, 24, 40, .1); }
+#preview { max-width: 100%; height: auto; border-radius: 8px; box-shadow: var(--shadow-lift); }
 
 /* ---------- 体检 ---------- */
 .checks { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 7px; }
 .checks li {
   display: flex; gap: 9px; align-items: flex-start; font-size: 12.5px;
-  padding: 8px 10px; border-radius: 8px; background: #fafafa; border: 1px solid var(--line);
+  padding: 8px 11px; border-radius: 12px; background: var(--tint); border: 1px solid var(--line);
 }
 .checks li .ic { flex: 0 0 auto; font-weight: 700; line-height: 1.35; }
-.checks li.ok { background: var(--ok-soft); border-color: #cdece0; color: #0b6b4c; }
-.checks li.warn { background: var(--warn-soft); border-color: #fadfc0; color: #8a3d06; }
-.checks li.bad { background: var(--bad-soft); border-color: #f6d5d1; color: #98221a; }
-.checks li.info { background: #f7f8fa; }
-.checks li .txt b { font-weight: 600; }
+.checks li.ok { background: var(--ok-soft); border-color: var(--ok-line); color: var(--ok); }
+.checks li.warn { background: var(--warn-soft); border-color: var(--warn-line); color: var(--warn); }
+.checks li.bad { background: var(--bad-soft); border-color: var(--bad-line); color: var(--bad); }
+.checks li .txt b { font-weight: 700; }
 .note { font-size: 11.5px; color: var(--muted); margin: 10px 0 0; }
 .note:empty { display: none; }
 .spacing-note { line-height: 1.75; }
-.spacing-note b { color: var(--text); font-weight: 600; }
+.spacing-note b { color: var(--text); font-weight: 700; }
 
 /* ---------- 云端保存 ---------- */
 .cloud-wrap { padding: 0 22px 60px; max-width: 1500px; margin: 0 auto; }
 .cloud-head-actions { display: flex; gap: 8px; }
-.cloud-status { color: var(--accent); }
-.cloud-count-full, #cloudCount.full { color: var(--bad); font-weight: 600; }
+.cloud-status { color: var(--pink-deep); }
+.cloud-count-full, #cloudCount.full { color: var(--bad); font-weight: 700; }
 .cloud-list {
   display: grid; gap: 10px; margin-top: 12px;
   grid-template-columns: repeat(auto-fill, minmax(196px, 1fr));
 }
 .cloud-empty {
   grid-column: 1 / -1; padding: 26px 16px; text-align: center; font-size: 12.5px; color: var(--muted);
-  border: 1.5px dashed var(--line-strong); border-radius: 10px; background: #fcfcfd; line-height: 1.7;
+  border: 1.5px dashed var(--line-warm); border-radius: 14px; background: var(--tint); line-height: 1.7;
 }
-.cloud-empty span { font-size: 11.5px; color: #98a2b3; }
+.cloud-empty span { font-size: 11.5px; color: var(--muted-soft); }
 .cloud-item {
   display: flex; flex-direction: column; gap: 8px; padding: 10px; min-width: 0;
-  border: 1px solid var(--line); border-radius: 10px; background: #fff; transition: .15s;
+  border: 1px solid var(--line-strong); border-radius: 14px; background: var(--panel); transition: .15s;
 }
-.cloud-item:hover { border-color: var(--line-strong); box-shadow: var(--shadow); }
-.cloud-item.active { border-color: var(--accent); background: var(--accent-soft); }
+.cloud-item:hover { border-color: var(--line-warm); box-shadow: var(--shadow); }
+.cloud-item.active { border-color: var(--pink); background: var(--pink-soft); }
 .ci-thumb {
   display: flex; align-items: center; justify-content: center; height: 116px; overflow: hidden;
-  border-radius: 7px; background: #f7f8fa; border: 1px solid var(--line);
+  border-radius: 10px; background: var(--tint); border: 1px solid var(--line);
 }
 .ci-thumb img { max-width: 100%; max-height: 100%; object-fit: contain; }
-.ci-thumb span { font-size: 11.5px; color: #98a2b3; }
+.ci-thumb span { font-size: 11.5px; color: var(--muted-soft); }
 .ci-body { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
 .ci-name {
-  font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  font-size: 13px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  letter-spacing: -.005em;
 }
 .ci-meta { font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; }
 .ci-actions { display: flex; gap: 6px; }
-.ci-actions .mini { flex: 1; padding: 4px 6px; font-size: 11.5px; border-radius: 6px; }
-.ci-actions .mini.danger { color: var(--bad); border-color: #f0cfcb; }
+.ci-actions .mini { flex: 1; padding: 4px 8px; font-size: 11.5px; border-radius: var(--radius-btn); }
+.ci-actions .mini.danger { color: var(--bad); border-color: var(--bad-line); }
 .ci-actions .mini.danger:hover { background: var(--bad-soft); }
 
 /* ---------- Toast ---------- */
 .toast {
   position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%) translateY(10px);
-  background: #101828; color: #fff; font-size: 13px; padding: 10px 16px; border-radius: 10px;
-  box-shadow: 0 8px 30px rgba(16, 24, 40, .28); z-index: 60; opacity: 0; transition: .2s;
+  background: var(--accent); color: #fff; font-size: 13px; padding: 10px 18px; border-radius: var(--radius-btn);
+  box-shadow: 0 8px 30px rgba(23, 23, 19, .26); z-index: 60; opacity: 0; transition: .2s;
 }
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
@@ -430,7 +471,7 @@ button.sm { padding: 5px 10px; font-size: 12px; }
           <input type="range" id="textGap" min="0" max="120" step="1" value="21">
         </label>
       </div>
-      <p class="note spacing-note" data-i18n="spacingNote"></p>
+      <p class="note spacing-note" data-i18n-html="spacingNote"></p>
       <div class="row">
         <label class="field grow">
           <span class="label"><span data-i18n="qrSize"></span> <b id="qsVal">320</b>px</span>
@@ -3284,11 +3325,13 @@ function t(key, params) {
   return s;
 }
 
-/** 把 [data-i18n] / [data-i18n-ph] / [data-i18n-title] 填进去 */
+/** 把 [data-i18n] / [data-i18n-html] / [data-i18n-ph] / [data-i18n-title] 填进去 */
 function applyStaticText() {
   document.documentElement.lang = HTML_LANG[LANG] || 'en';
   document.title = t('docTitle');
   document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
+  // 文案里带 <b> 等标记的用这个（只有我们自己的字典会进来，不是用户输入）
+  document.querySelectorAll('[data-i18n-html]').forEach(el => { el.innerHTML = t(el.dataset.i18nHtml); });
   document.querySelectorAll('[data-i18n-ph]').forEach(el => { el.placeholder = t(el.dataset.i18nPh); });
   document.querySelectorAll('[data-i18n-title]').forEach(el => { el.title = t(el.dataset.i18nTitle); });
 }
