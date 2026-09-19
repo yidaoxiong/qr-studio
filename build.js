@@ -23,6 +23,7 @@ const FAVICON = iconDataUrl(64);
 let html = read('src/index.html');
 const css = read('src/app.css');
 const app = [
+  read('src/i18n.js'),     // 必须最先：LANG / t() 供后面所有模块使用
   read('src/app-core.js'),
   read('src/app-ui.js'),
   read('src/app-cloud.js'),

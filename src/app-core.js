@@ -16,37 +16,40 @@ if (typeof qrcode !== 'undefined' && qrcode.stringToBytesFuncs && qrcode.stringT
 const APP_VERSION = '/*__APP_VERSION__*/';
 
 /* ------------------------------------------------------------------ 字体表 */
-/* cat 用于 PDF 标准字体映射；css 为跨平台回退栈，末尾带 CJK 兜底 */
+/* cat 用于 PDF 标准字体映射（sans/serif/mono）；css 为跨平台回退栈，末尾带 CJK 兜底
+ * 显示名不在表里写死 —— 由 ck（类别的 i18n key）+ name/nk 拼出来，跟随界面语言 */
 const FONTS = [
-  { id: 'helv', label: '无衬线 · Helvetica Neue', css: '"Helvetica Neue", Helvetica, Arial, "PingFang SC", sans-serif', cat: 'sans' },
-  { id: 'sf', label: '无衬线 · 系统默认', css: '-apple-system, "SF Pro Text", "Segoe UI", Roboto, "PingFang SC", sans-serif', cat: 'sans' },
-  { id: 'arial', label: '无衬线 · Arial', css: 'Arial, Helvetica, "PingFang SC", sans-serif', cat: 'sans' },
-  { id: 'verdana', label: '无衬线 · Verdana', css: 'Verdana, Geneva, "PingFang SC", sans-serif', cat: 'sans' },
-  { id: 'tahoma', label: '无衬线 · Tahoma', css: 'Tahoma, Verdana, "PingFang SC", sans-serif', cat: 'sans' },
-  { id: 'trebuchet', label: '无衬线 · Trebuchet MS', css: '"Trebuchet MS", Tahoma, "PingFang SC", sans-serif', cat: 'sans' },
-  { id: 'futura', label: '几何 · Futura', css: 'Futura, "Century Gothic", "PingFang SC", sans-serif', cat: 'sans' },
-  { id: 'gillsans', label: '人文 · Gill Sans', css: '"Gill Sans", "Gill Sans MT", Calibri, "PingFang SC", sans-serif', cat: 'sans' },
-  { id: 'segoe', label: '无衬线 · Segoe UI', css: '"Segoe UI", Roboto, "Helvetica Neue", "PingFang SC", sans-serif', cat: 'sans' },
-  { id: 'georgia', label: '衬线 · Georgia', css: 'Georgia, "Times New Roman", serif', cat: 'serif' },
-  { id: 'times', label: '衬线 · Times New Roman', css: '"Times New Roman", Times, Georgia, serif', cat: 'serif' },
-  { id: 'palatino', label: '衬线 · Palatino', css: 'Palatino, "Palatino Linotype", "Book Antiqua", Georgia, serif', cat: 'serif' },
-  { id: 'baskerville', label: '衬线 · Baskerville', css: 'Baskerville, "Libre Baskerville", Georgia, serif', cat: 'serif' },
-  { id: 'didot', label: '高对比衬线 · Didot', css: 'Didot, "Bodoni 72", "Playfair Display", Georgia, serif', cat: 'serif' },
-  { id: 'songti', label: '中文 · 宋体 / Songti', css: '"Songti SC", SimSun, "Times New Roman", serif', cat: 'serif' },
-  { id: 'menlo', label: '等宽 · Menlo', css: 'Menlo, Monaco, "Courier New", monospace', cat: 'mono' },
-  { id: 'courier', label: '等宽 · Courier New', css: '"Courier New", Courier, monospace', cat: 'mono' },
-  { id: 'impact', label: '标题 · Impact', css: 'Impact, "Haettenschweiler", "Arial Narrow Bold", sans-serif', cat: 'sans' },
-  { id: 'arialblack', label: '标题 · Arial Black', css: '"Arial Black", "Arial Bold", Gadget, sans-serif', cat: 'sans' },
-  { id: 'rounded', label: '圆体 · Arial Rounded', css: '"Arial Rounded MT Bold", "Hiragino Maru Gothic ProN", "Yuanti SC", sans-serif', cat: 'sans' },
-  { id: 'copperplate', label: '装饰 · Copperplate', css: 'Copperplate, "Copperplate Gothic Light", "Times New Roman", serif', cat: 'serif' },
-  { id: 'chalkboard', label: '手写 · Chalkboard SE', css: '"Chalkboard SE", "Comic Sans MS", "Segoe Print", sans-serif', cat: 'sans' },
-  { id: 'marker', label: '手写 · Marker Felt', css: '"Marker Felt", "Comic Sans MS", cursive', cat: 'sans' },
-  { id: 'snell', label: '花体 · Snell Roundhand', css: '"Snell Roundhand", "Apple Chancery", "Segoe Script", cursive', cat: 'serif' },
-  { id: 'pingfang', label: '中文 · 苹方 / PingFang', css: '"PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif', cat: 'sans' },
-  { id: 'kaiti', label: '中文 · 楷体 / Kaiti', css: '"Kaiti SC", KaiTi, STKaiti, serif', cat: 'serif' },
-  { id: 'yuanti', label: '中文 · 圆体 / Yuanti', css: '"Yuanti SC", "Hiragino Maru Gothic ProN", "PingFang SC", sans-serif', cat: 'sans' },
+  { id: 'helv', name: 'Helvetica Neue', ck: 'c.sans', css: '"Helvetica Neue", Helvetica, Arial, "PingFang SC", sans-serif', cat: 'sans' },
+  { id: 'sf', nk: 'f.sysDefault', ck: 'c.sans', css: '-apple-system, "SF Pro Text", "Segoe UI", Roboto, "PingFang SC", sans-serif', cat: 'sans' },
+  { id: 'arial', name: 'Arial', ck: 'c.sans', css: 'Arial, Helvetica, "PingFang SC", sans-serif', cat: 'sans' },
+  { id: 'verdana', name: 'Verdana', ck: 'c.sans', css: 'Verdana, Geneva, "PingFang SC", sans-serif', cat: 'sans' },
+  { id: 'tahoma', name: 'Tahoma', ck: 'c.sans', css: 'Tahoma, Verdana, "PingFang SC", sans-serif', cat: 'sans' },
+  { id: 'trebuchet', name: 'Trebuchet MS', ck: 'c.sans', css: '"Trebuchet MS", Tahoma, "PingFang SC", sans-serif', cat: 'sans' },
+  { id: 'futura', name: 'Futura', ck: 'c.geom', css: 'Futura, "Century Gothic", "PingFang SC", sans-serif', cat: 'sans' },
+  { id: 'gillsans', name: 'Gill Sans', ck: 'c.humanist', css: '"Gill Sans", "Gill Sans MT", Calibri, "PingFang SC", sans-serif', cat: 'sans' },
+  { id: 'segoe', name: 'Segoe UI', ck: 'c.sans', css: '"Segoe UI", Roboto, "Helvetica Neue", "PingFang SC", sans-serif', cat: 'sans' },
+  { id: 'georgia', name: 'Georgia', ck: 'c.serif', css: 'Georgia, "Times New Roman", serif', cat: 'serif' },
+  { id: 'times', name: 'Times New Roman', ck: 'c.serif', css: '"Times New Roman", Times, Georgia, serif', cat: 'serif' },
+  { id: 'palatino', name: 'Palatino', ck: 'c.serif', css: 'Palatino, "Palatino Linotype", "Book Antiqua", Georgia, serif', cat: 'serif' },
+  { id: 'baskerville', name: 'Baskerville', ck: 'c.serif', css: 'Baskerville, "Libre Baskerville", Georgia, serif', cat: 'serif' },
+  { id: 'didot', name: 'Didot', ck: 'c.serif', css: 'Didot, "Bodoni 72", "Playfair Display", Georgia, serif', cat: 'serif' },
+  { id: 'songti', nk: 'f.songti', ck: 'c.cjk', css: '"Songti SC", SimSun, "Times New Roman", serif', cat: 'serif' },
+  { id: 'menlo', name: 'Menlo', ck: 'c.mono', css: 'Menlo, Monaco, "Courier New", monospace', cat: 'mono' },
+  { id: 'courier', name: 'Courier New', ck: 'c.mono', css: '"Courier New", Courier, monospace', cat: 'mono' },
+  { id: 'impact', name: 'Impact', ck: 'c.display', css: 'Impact, "Haettenschweiler", "Arial Narrow Bold", sans-serif', cat: 'sans' },
+  { id: 'arialblack', name: 'Arial Black', ck: 'c.display', css: '"Arial Black", "Arial Bold", Gadget, sans-serif', cat: 'sans' },
+  { id: 'rounded', name: 'Arial Rounded', ck: 'c.round', css: '"Arial Rounded MT Bold", "Hiragino Maru Gothic ProN", "Yuanti SC", sans-serif', cat: 'sans' },
+  { id: 'copperplate', name: 'Copperplate', ck: 'c.decor', css: 'Copperplate, "Copperplate Gothic Light", "Times New Roman", serif', cat: 'serif' },
+  { id: 'chalkboard', name: 'Chalkboard SE', ck: 'c.hand', css: '"Chalkboard SE", "Comic Sans MS", "Segoe Print", sans-serif', cat: 'sans' },
+  { id: 'marker', name: 'Marker Felt', ck: 'c.hand', css: '"Marker Felt", "Comic Sans MS", cursive', cat: 'sans' },
+  { id: 'snell', name: 'Snell Roundhand', ck: 'c.script', css: '"Snell Roundhand", "Apple Chancery", "Segoe Script", cursive', cat: 'serif' },
+  { id: 'pingfang', nk: 'f.pingfang', ck: 'c.cjk', css: '"PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif', cat: 'sans' },
+  { id: 'kaiti', nk: 'f.kaiti', ck: 'c.cjk', css: '"Kaiti SC", KaiTi, STKaiti, serif', cat: 'serif' },
+  { id: 'yuanti', nk: 'f.yuanti', ck: 'c.cjk', css: '"Yuanti SC", "Hiragino Maru Gothic ProN", "PingFang SC", sans-serif', cat: 'sans' },
 ];
 const fontById = id => FONTS.find(f => f.id === id) || FONTS[0];
+/** 字体在下拉框里的显示名：类别（跟随语言） · 名字 */
+const fontLabel = f => t(f.ck) + ' · ' + (f.nk ? t(f.nk) : f.name);
 
 /* --------------------------------------------------- WinAnsi（PDF 标准字体） */
 const WINANSI_EXT = {
@@ -85,6 +88,7 @@ const DEFAULTS = {
   cardColor: '#ffffff',
   cardRadius: 24,
   cardPad: 28,
+  imagePad: 0,      // 图片（二维码）四周的额外留白，叠在卡片内边距之上
   qrSize: 320,
   exportScale: 2,
   transparentBg: false,
@@ -97,6 +101,7 @@ const DEFAULTS = {
 
   title: '',
   subtitle: '',
+  textGap: 21,      // 图片与下方文字之间的距离（原来写死成 内边距×0.75）
   fontId: 'helv',
   titleSize: 22,
   subSize: 14,
@@ -279,19 +284,23 @@ function buildScene(st, opts) {
   const boxNeed = dmgPct ? requiredVersionForBox(dmgPct.wPct, dmgPct.hPct) : 0;
   const vFloor = st.version > 0 ? st.version : boxNeed;
   const qr = makeQR(st.content || ' ', st.ecc, vFloor);
-  if (!qr) return { ok: false, error: '内容过长，超出二维码容量上限（可缩短文本或降低容错级别）' };
+  // 错误以 i18n key 返回，由 UI 层翻译成当前语言
+  if (!qr) return { ok: false, error: 'toast.contentTooLong' };
 
   const n = qr.getModuleCount();
   const version = (n - 17) / 4;
   const Q = st.qrSize;
   const P = st.cardPad;
+  const M = st.imagePad;                // 图片四周额外留白
+  const G = st.textGap;                 // 图片与下方文字之间的距离
+  const pad = P + M;                    // 图片四周的实际留白
   const total = n + st.quiet * 2;
   const ms = Q / total;                 // 单模块边长
   const matSize = n * ms;               // 矩阵区（不含静区）
   const matOff = st.quiet * ms;
-  // ★ 二维码整块必须落在卡片的 (P,P) 位置。之前漏了这个偏移，
+  // ★ 二维码整块必须落在卡片的 (pad,pad) 位置。之前漏了这个偏移，
   //   导致二维码贴着卡片左上角画，视觉上明显不居中。
-  const matX = P + matOff, matY = P + matOff;   // 矩阵左上角在卡片中的坐标
+  const matX = pad + matOff, matY = pad + matOff;   // 矩阵左上角在卡片中的坐标
 
   // Logo 几何（logoLayout 是唯一真源，数值为矩阵边长的比例）
   const L = logoLayout(st);
@@ -306,9 +315,8 @@ function buildScene(st, opts) {
   const clipRad = Math.min(px(L.dw), px(L.dh)) * 0.22;
 
   // 字体排版
-  const cardW = Q + P * 2;
+  const cardW = Q + pad * 2;
   const innerW = Q;
-  const capGap = Math.round(P * 0.75);
   const subWeight = String(Math.min(500, +st.weight));
   const lines = [];
   if (includeCaption) {
@@ -323,7 +331,8 @@ function buildScene(st, opts) {
   lines.forEach(l => { capH += l.size * st.lineHeight; });
   capH += lines.reduce((a, l) => a + (l.gapBefore || 0), 0);
 
-  const cardH = Q + P * 2 + (lines.length ? capGap + capH : 0);
+  // 无文字时上下都是 pad；有文字时下面是「图片→文字 G」+「文字→卡片底 P」
+  const cardH = pad + Q + (lines.length ? G + capH + P : pad);
   const scene = { w: cardW, h: cardH, items: [], card: { w: cardW, h: cardH, r: st.cardRadius }, bgColor: st.cardColor };
   const items = scene.items;
 
@@ -357,13 +366,14 @@ function buildScene(st, opts) {
   }
 
   // 3) 文字
-  let cursor = Q + P + capGap;
+  let cursor = pad + Q + G;
   for (const l of lines) {
     cursor += l.gapBefore || 0;
     const w = l.weight;
     const baseline = cursor + l.size * 0.78;
     const lw = textWidth(l.text, l.size, f.css, w, l.ls);
-    const x = st.align === 'center' ? cardW / 2 : (st.align === 'left' ? P : cardW - P);
+    // 左右对齐时以图片的实际左/右边缘为基准（跟着 imagePad 走，不留出内外不一致的错位）
+    const x = st.align === 'center' ? cardW / 2 : (st.align === 'left' ? pad : cardW - pad);
     items.push({
       k: 'text', x, y: baseline, s: l.text, w: lw,
       size: l.size, family: f.css, cat: f.cat, weight: w, ls: l.ls,
@@ -408,9 +418,10 @@ function drawScene(ctx, scene, scale, st) {
     ctx.clip();
   }
   if (!st.transparentBg && st.bgColor !== st.cardColor) {
-    // 码区底色（静区在内）
+    // 码区底色（静区在内）—— 位置必须跟着 imagePad 走，否则会和码点错位
+    const pad = st.cardPad + st.imagePad;
     ctx.fillStyle = st.bgColor;
-    ctx.fillRect(st.cardPad, st.cardPad, st.qrSize, st.qrSize);
+    ctx.fillRect(pad, pad, st.qrSize, st.qrSize);
   }
 
   for (const it of scene.items) {
@@ -486,7 +497,8 @@ function toSVG(scene, st) {
     body.push(`<path d="${roundRectSVG(0, 0, scene.w, scene.h, scene.card.r)}" fill="${st.cardColor}"/>`);
   }
   if (!st.transparentBg && st.bgColor !== st.cardColor) {
-    body.push(`<rect x="${st.cardPad}" y="${st.cardPad}" width="${st.qrSize}" height="${st.qrSize}" fill="${st.bgColor}"/>`);
+    const pad = st.cardPad + st.imagePad;   // 必须跟着 imagePad，否则和码点错位
+    body.push(`<rect x="${pad}" y="${pad}" width="${st.qrSize}" height="${st.qrSize}" fill="${st.bgColor}"/>`);
   }
   let pendingRuns = null;   // 合并连续方块，减小体积
   const flushRuns = () => {
@@ -569,7 +581,8 @@ function toPDF(scene, st) {
     ops.push('q', rgbOp(st.cardColor) + ' rg', pdfPath(0, 0, scene.w, scene.h, st.cardRadius) + ' f', 'Q');
   }
   if (!st.transparentBg && st.bgColor !== st.cardColor) {
-    ops.push('q', rgbOp(st.bgColor) + ' rg', pdfPath(st.cardPad, st.cardPad, st.qrSize, st.qrSize, 0) + ' f', 'Q');
+    const pad = st.cardPad + st.imagePad;   // 必须跟着 imagePad，否则和码点错位
+    ops.push('q', rgbOp(st.bgColor) + ' rg', pdfPath(pad, pad, st.qrSize, st.qrSize, 0) + ' f', 'Q');
   }
 
   // 码点：方块样式按行程合并成一条路径

@@ -71,19 +71,17 @@ async function cloudSave() {
   if (!res.ok) return toast(res.error, 3600);
 
   const name = (cloudLoadedId ? (state._cloudName || '') : '') ||
-    (state.title || state.content || '未命名二维码').slice(0, 40);
+    (state.title || state.content || t('cloud.unnamed')).slice(0, 40);
 
   // 覆盖确认：已从云端载入过，就直接问要不要覆盖
   let targetId = null;
   if (cloudLoadedId) {
-    const yes = window.confirm(
-      `覆盖云端已有条目？\n\n【确定】覆盖「${state._cloudName || name}」\n【取消】另存为新条目`
-    );
+    const yes = window.confirm(t('cloud.confirmOverwrite', { name: state._cloudName || name }));
     if (yes) targetId = cloudLoadedId;
   }
 
   cloudBusy = true;
-  setCloudStatus('正在生成并上传…');
+  setCloudStatus(t('cloud.saving'));
   try {
     const cv = renderToCanvas(res.scene, state, state.exportScale);
     const png = cv.toDataURL('image/png');
@@ -117,16 +115,16 @@ async function cloudSave() {
     });
     cloudLoadedId = out.id;
     state._cloudName = out.name;
-    toast(`已保存到云端：${out.name}`, 2600);
+    toast(t('cloud.saved', { name: out.name }), 2600);
     await cloudRefresh();
   } catch (e) {
     const msg = String(e.message || e);
     if (msg.indexOf('limit_reached') === 0) {
-      toast(`云端最多存 ${msg.split(':')[1] || 20} 个，请先删掉一个再存`, 4200);
+      toast(t('cloud.limit', { n: msg.split(':')[1] || 20 }), 4200);
     } else if (msg === 'Failed to fetch' || msg.indexOf('Load failed') >= 0) {
-      toast('连不上云端接口：请通过部署后的网址访问（本地单文件模式不支持云保存）', 4600);
+      toast(t('cloud.offline'), 4600);
     } else {
-      toast('保存失败：' + msg, 4200);
+      toast(t('cloud.saveFail', { msg }), 4200);
     }
   } finally {
     cloudBusy = false;
@@ -148,7 +146,7 @@ function setCloudCount(n) {
 async function cloudRefresh(silent) {
   const box = $('cloudList');
   if (!box) return;
-  if (!silent) box.innerHTML = '<div class="cloud-empty">读取中…</div>';
+  if (!silent) box.innerHTML = `<div class="cloud-empty">${t('cloud.loading')}</div>`;
   try {
     const out = await cloudFetch(CLOUD_API, { headers: { accept: 'application/json' } });
     cloudItems = out.items || [];
@@ -157,25 +155,25 @@ async function cloudRefresh(silent) {
   } catch (e) {
     cloudItems = [];
     setCloudCount(null);
-    box.innerHTML = `<div class="cloud-empty">云端未就绪（${String(e.message || e)}）<br><span>本地单文件打开时属正常现象；部署后可正常使用。</span></div>`;
+    box.innerHTML = `<div class="cloud-empty">${t('cloud.error', { msg: String(e.message || e) })}</div>`;
   }
 }
 function renderCloudList() {
   const box = $('cloudList');
   if (!cloudItems.length) {
-    box.innerHTML = '<div class="cloud-empty">还没有保存过。调好样式后点「保存到云端」。</div>';
+    box.innerHTML = `<div class="cloud-empty">${t('cloud.empty')}</div>`;
     return;
   }
   box.innerHTML = cloudItems.map(it => `
     <div class="cloud-item${it.id === cloudLoadedId ? ' active' : ''}" data-id="${it.id}">
-      <div class="ci-thumb">${it.thumb ? `<img src="${it.thumb}" alt="">` : '<span>无预览</span>'}</div>
+      <div class="ci-thumb">${it.thumb ? `<img src="${it.thumb}" alt="">` : `<span>${t('cloud.noPreview')}</span>`}</div>
       <div class="ci-body">
         <div class="ci-name" title="${escapeHtml(it.name)}">${escapeHtml(it.name)}</div>
         <div class="ci-meta">${fmtTime(it.createdAt)} · ${it.w || '?'}×${it.h || '?'} · ${fmtBytes(it.bytes)}</div>
         <div class="ci-actions">
-          <button class="mini primary" data-act="load">载入</button>
-          <button class="mini" data-act="png">PNG</button>
-          <button class="mini danger" data-act="del">删除</button>
+          <button class="mini primary" data-act="load">${t('cloud.load')}</button>
+          <button class="mini" data-act="png">${t('cloud.png')}</button>
+          <button class="mini danger" data-act="del">${t('cloud.del')}</button>
         </div>
       </div>
     </div>`).join('');
@@ -188,14 +186,14 @@ function escapeHtml(s) {
 async function cloudLoad(id) {
   if (cloudBusy) return;
   cloudBusy = true;
-  setCloudStatus('载入中…');
+  setCloudStatus(t('cloud.loadingOne'));
   try {
     const out = await cloudFetch(CLOUD_API + '/' + id);
     const rec = out.item;
     applyRecipe(rec.recipe, rec.logo, rec.name, id);
-    toast('已载入「' + rec.name + '」');
+    toast(t('cloud.loaded', { name: rec.name }));
   } catch (e) {
-    toast('载入失败：' + String(e.message || e), 4000);
+    toast(t('cloud.loadFail', { msg: String(e.message || e) }), 4000);
   } finally {
     cloudBusy = false;
     setCloudStatus('');
@@ -214,7 +212,7 @@ function applyRecipe(recipe, logo, name, id) {
     state.logoSrc = logo;
     const img = new Image();
     img.onload = () => { state.logoImg = img; $('logoThumb').src = logo; $('logoThumb').hidden = false; finish(); };
-    img.onerror = () => { state.logoImg = null; state.logoSrc = null; $('logoThumb').hidden = true; finish(); toast('配方已载入，但 Logo 图片加载失败'); };
+    img.onerror = () => { state.logoImg = null; state.logoSrc = null; $('logoThumb').hidden = true; finish(); toast(t('cloud.logoFail')); };
     img.src = logo;
   } else {
     state.logoImg = null; state.logoSrc = null;
@@ -224,7 +222,7 @@ function applyRecipe(recipe, logo, name, id) {
 }
 async function cloudDownloadPng(id) {
   const it = cloudItems.find(x => x.id === id);
-  setCloudStatus('取回文件中…');
+  setCloudStatus(t('cloud.fetching'));
   try {
     const out = await cloudFetch(CLOUD_API + '/' + id);
     const rec = out.item;
@@ -232,26 +230,26 @@ async function cloudDownloadPng(id) {
     const buf = new Uint8Array(bin.length);
     for (let i = 0; i < bin.length; i++) buf[i] = bin.charCodeAt(i);
     download(new Blob([buf], { type: 'image/png' }), `qrcode-${(it ? it.name : id).replace(/[\\/:*?"<>|]/g, '_')}.png`);
-    toast('已下载云端文件');
+    toast(t('cloud.downloaded'));
   } catch (e) {
-    toast('下载失败：' + String(e.message || e), 4000);
+    toast(t('cloud.dlFail', { msg: String(e.message || e) }), 4000);
   } finally {
     setCloudStatus('');
   }
 }
 async function cloudDelete(id) {
   const it = cloudItems.find(x => x.id === id);
-  if (!window.confirm(`删除云端条目「${it ? it.name : id}」？不可恢复。`)) return;
+  if (!window.confirm(t('cloud.confirmDelete', { name: it ? it.name : id }))) return;
   if (cloudBusy) return;
   cloudBusy = true;
-  setCloudStatus('删除中…');
+  setCloudStatus(t('cloud.deleting'));
   try {
     await cloudFetch(CLOUD_API + '/' + id, { method: 'DELETE' });
     if (cloudLoadedId === id) cloudLoadedId = null;
-    toast('已删除');
+    toast(t('cloud.deleted'));
     await cloudRefresh(true);
   } catch (e) {
-    toast('删除失败：' + String(e.message || e), 4000);
+    toast(t('cloud.delFail', { msg: String(e.message || e) }), 4000);
   } finally {
     cloudBusy = false;
     setCloudStatus('');

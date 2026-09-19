@@ -12,13 +12,14 @@
   <div class="brand">
     <img class="brand-icon" src="/*__BRAND_ICON__*/" alt="Slashbro" width="26" height="26">
     <h1>QR Logo Studio</h1>
-    <span class="ver" id="appVersion" title="应用版本"></span>
-    <span class="tag">Logo + 文字说明 · 离线可用</span>
+    <span class="ver" id="appVersion" data-i18n-title="verTitle"></span>
+    <span class="tag" data-i18n="tag"></span>
   </div>
   <div class="topbar-actions">
-    <button id="btnReset" class="ghost">重置</button>
-    <button id="btnPresetLight" class="ghost">浅色模板</button>
-    <button id="btnPresetDark" class="ghost">深色模板</button>
+    <select id="langSel" class="lang-sel" data-i18n-title="lang.title"></select>
+    <button id="btnReset" class="ghost" data-i18n="reset"></button>
+    <button id="btnPresetLight" class="ghost" data-i18n="presetLight"></button>
+    <button id="btnPresetDark" class="ghost" data-i18n="presetDark"></button>
   </div>
 </header>
 
@@ -26,14 +27,14 @@
   <!-- ================= 左：控制面板 ================= -->
   <section class="panel">
     <div class="card">
-      <h2>1 · 二维码内容</h2>
+      <h2 data-i18n="h.content"></h2>
       <label class="field">
-        <span class="label">文本 / 网址</span>
+        <span class="label" data-i18n="contentLabel"></span>
         <textarea id="content" rows="3" spellcheck="false" placeholder="https://example.com">https://slashbro.top/</textarea>
       </label>
       <div class="row">
         <label class="field grow">
-          <span class="label">容错级别 <em id="eccHint"></em></span>
+          <span class="label"><span data-i18n="ecc"></span> <em id="eccHint"></em></span>
           <div class="segmented" id="eccSeg">
             <button data-v="L">L 7%</button>
             <button data-v="M">M 15%</button>
@@ -44,181 +45,192 @@
       </div>
       <div class="row">
         <label class="field grow">
-          <span class="label">版本（自动 = 按内容最小）</span>
-          <select id="version"><option value="0">自动</option></select>
+          <span class="label" data-i18n="version"></span>
+          <select id="version"></select>
         </label>
         <label class="field grow">
-          <span class="label">静区（模块）</span>
+          <span class="label" data-i18n="quiet"></span>
           <input type="number" id="quiet" value="4" min="0" max="10" step="1">
         </label>
       </div>
     </div>
 
     <div class="card">
-      <h2>2 · Logo（居中，支持方形 / 长方形）</h2>
+      <h2 data-i18n="h.logo"></h2>
       <div id="drop" class="drop">
         <input type="file" id="logoFile" accept="image/*" hidden>
         <div class="drop-inner">
-          <span><b>拖入图片</b> / <span class="link" id="pickLogo">点击选择</span> / 支持粘贴</span>
-          <small>PNG · JPG · SVG · WebP；自动按原始比例适配框内</small>
+          <span><b data-i18n="drop.drag"></b> / <span class="link" id="pickLogo" data-i18n="drop.pick"></span> / <span data-i18n="drop.paste"></span></span>
+          <small data-i18n="drop.formats"></small>
         </div>
         <img id="logoThumb" alt="" hidden>
       </div>
       <div class="row">
         <label class="field grow">
-          <span class="label">Logo 来源 URL</span>
+          <span class="label" data-i18n="logoUrl"></span>
           <input type="url" id="logoUrl" placeholder="https://…/logo.png">
         </label>
-        <button id="btnLoadUrl" class="ghost self-end">载入</button>
+        <button id="btnLoadUrl" class="ghost self-end" data-i18n="btnLoad"></button>
       </div>
       <div class="row">
         <label class="field grow">
-          <span class="label">宽 <b id="lwVal">22%</b> <em>占二维码边长</em></span>
+          <span class="label"><span data-i18n="logoW"></span> <b id="lwVal">22%</b> <em data-i18n="logoWUnit"></em></span>
           <input type="range" id="logoW" min="0" max="60" step="1" value="22">
         </label>
         <label class="field grow">
-          <span class="label">高 <b id="lhVal">22%</b></span>
+          <span class="label"><span data-i18n="logoH"></span> <b id="lhVal">22%</b></span>
           <input type="range" id="logoH" min="0" max="60" step="1" value="22">
         </label>
       </div>
       <div class="row wrap">
-        <button class="chip" data-ratio="square">正方形</button>
-        <button class="chip" data-ratio="wide">横版 2:1</button>
-        <button class="chip" data-ratio="wide3">横版 3:1</button>
-        <button class="chip" data-ratio="tall">竖版 1:2</button>
-        <button class="chip" data-ratio="fit">按图片比例</button>
-        <button class="chip" data-ratio="clear">清除 Logo</button>
+        <button class="chip" data-ratio="square" data-i18n="chip.square"></button>
+        <button class="chip" data-ratio="wide" data-i18n="chip.wide"></button>
+        <button class="chip" data-ratio="wide3" data-i18n="chip.wide3"></button>
+        <button class="chip" data-ratio="tall" data-i18n="chip.tall"></button>
+        <button class="chip" data-ratio="fit" data-i18n="chip.fit"></button>
+        <button class="chip" data-ratio="clear" data-i18n="chip.clear"></button>
       </div>
       <div class="row">
         <label class="field grow">
-          <span class="label">Logo 形状 <em id="shapeHint"></em></span>
+          <span class="label"><span data-i18n="logoShape"></span> <em id="shapeHint"></em></span>
           <select id="logoShape">
-            <option value="none">原始（不裁剪，保留图片比例）</option>
-            <option value="round" selected>圆角矩形（贴住图片）</option>
-            <option value="square">正方形（图片居中留白）</option>
-            <option value="circle">圆形（居中裁切，头像式）</option>
+            <option value="none" data-i18n="shape.none"></option>
+            <option value="round" selected data-i18n="shape.round"></option>
+            <option value="square" data-i18n="shape.square"></option>
+            <option value="circle" data-i18n="shape.circle"></option>
           </select>
         </label>
         <label class="field grow">
-          <span class="label">底板内边距 <b id="lpadVal">10%</b></span>
+          <span class="label"><span data-i18n="platePad"></span> <b id="lpadVal">10%</b></span>
           <input type="range" id="logoPad" min="0" max="40" step="1" value="10">
         </label>
       </div>
-      <label class="check"><input type="checkbox" id="logoPlate" checked> Logo 后面加白色底板（提高可扫性）</label>
+      <label class="check"><input type="checkbox" id="logoPlate" checked> <span data-i18n="plate"></span></label>
     </div>
 
     <div class="card">
-      <h2>3 · 下方文字说明</h2>
+      <h2 data-i18n="h.text"></h2>
       <label class="field">
-        <span class="label">主标题（可空）</span>
-        <input type="text" id="title" value="" placeholder="例如：扫码访问 slashbro.top">
+        <span class="label" data-i18n="titleField"></span>
+        <input type="text" id="title" value="" data-i18n-ph="titlePh">
       </label>
       <label class="field">
-        <span class="label">副标题 / 多语言说明（可空）</span>
-        <input type="text" id="subtitle" value="" placeholder="例如：Scannen · Escanear · Scan · 扫描">
+        <span class="label" data-i18n="subField"></span>
+        <input type="text" id="subtitle" value="" data-i18n-ph="subPh">
       </label>
       <label class="field">
-        <span class="label">字体</span>
+        <span class="label" data-i18n="font"></span>
         <select id="fontFamily"></select>
       </label>
       <div class="fontsample" id="fontSample">Grüße · ¡Hola! Año ¿qué? · Voilà être · 中文示例</div>
       <div class="row">
         <label class="field grow">
-          <span class="label">标题字号 <b id="tsVal">22</b></span>
+          <span class="label"><span data-i18n="titleSize"></span> <b id="tsVal">22</b></span>
           <input type="range" id="titleSize" min="8" max="72" step="1" value="22">
         </label>
         <label class="field grow">
-          <span class="label">副标题字号 <b id="ssVal">14</b></span>
+          <span class="label"><span data-i18n="subSize"></span> <b id="ssVal">14</b></span>
           <input type="range" id="subSize" min="6" max="48" step="1" value="14">
         </label>
       </div>
       <div class="row">
         <label class="field grow">
-          <span class="label">字重</span>
+          <span class="label" data-i18n="weight"></span>
           <select id="weight">
-            <option value="300">细体 300</option>
-            <option value="400">常规 400</option>
-            <option value="500">中等 500</option>
-            <option value="600" selected>半粗 600</option>
-            <option value="700">粗体 700</option>
-            <option value="900">特粗 900</option>
+            <option value="300" data-i18n="w.300"></option>
+            <option value="400" data-i18n="w.400"></option>
+            <option value="500" data-i18n="w.500"></option>
+            <option value="600" selected data-i18n="w.600"></option>
+            <option value="700" data-i18n="w.700"></option>
+            <option value="900" data-i18n="w.900"></option>
           </select>
         </label>
         <label class="field grow">
-          <span class="label">对齐</span>
+          <span class="label" data-i18n="align"></span>
           <select id="align">
-            <option value="center" selected>居中</option>
-            <option value="left">左对齐</option>
-            <option value="right">右对齐</option>
+            <option value="center" selected data-i18n="align.center"></option>
+            <option value="left" data-i18n="align.left"></option>
+            <option value="right" data-i18n="align.right"></option>
           </select>
         </label>
       </div>
       <div class="row">
         <label class="field grow">
-          <span class="label">字距 <b id="lsVal">0</b>px</span>
+          <span class="label"><span data-i18n="letterSpacing"></span> <b id="lsVal">0</b>px</span>
           <input type="range" id="letterSpacing" min="-2" max="10" step="0.5" value="0">
         </label>
         <label class="field grow">
-          <span class="label">行距 <b id="lhXVal">1.35</b></span>
+          <span class="label"><span data-i18n="lineHeight"></span> <b id="lhXVal">1.35</b></span>
           <input type="range" id="lineHeight" min="1" max="2.2" step="0.05" value="1.35">
         </label>
       </div>
       <label class="field">
-        <span class="label">文字颜色</span>
+        <span class="label" data-i18n="textColor"></span>
         <input type="color" id="textColor" value="#0f172a">
       </label>
     </div>
 
     <div class="card">
-      <h2>4 · 外观与输出</h2>
+      <h2 data-i18n="h.appearance"></h2>
       <div class="row">
         <label class="field grow">
-          <span class="label">码点颜色</span>
+          <span class="label" data-i18n="fgColor"></span>
           <input type="color" id="fgColor" value="#000000">
         </label>
         <label class="field grow">
-          <span class="label">码点背景</span>
+          <span class="label" data-i18n="bgColor"></span>
           <input type="color" id="bgColor" value="#ffffff">
         </label>
         <label class="field grow">
-          <span class="label">卡片背景</span>
+          <span class="label" data-i18n="cardColor"></span>
           <input type="color" id="cardColor" value="#ffffff">
         </label>
       </div>
       <label class="field">
-        <span class="label">模块形状</span>
+        <span class="label" data-i18n="moduleShape"></span>
         <div class="segmented" id="dotSeg">
-          <button data-v="square" class="on">方块</button>
-          <button data-v="round">圆角</button>
-          <button data-v="dots">圆点</button>
+          <button data-v="square" class="on" data-i18n="dot.square"></button>
+          <button data-v="round" data-i18n="dot.round"></button>
+          <button data-v="dots" data-i18n="dot.dots"></button>
         </div>
       </label>
       <div class="row">
         <label class="field grow">
-          <span class="label">卡片圆角 <b id="crVal">24</b>px</span>
+          <span class="label"><span data-i18n="cardRadius"></span> <b id="crVal">24</b>px</span>
           <input type="range" id="cardRadius" min="0" max="80" step="1" value="24">
         </label>
         <label class="field grow">
-          <span class="label">内边距 <b id="cpVal">28</b>px</span>
+          <span class="label"><span data-i18n="cardPad"></span> <b id="cpVal">28</b>px</span>
           <input type="range" id="cardPad" min="0" max="80" step="1" value="28">
         </label>
       </div>
       <div class="row">
         <label class="field grow">
-          <span class="label">二维码尺寸 <b id="qsVal">320</b>px</span>
+          <span class="label"><span data-i18n="imagePad"></span> <b id="ipVal">0</b>px</span>
+          <input type="range" id="imagePad" min="0" max="80" step="1" value="0">
+        </label>
+        <label class="field grow">
+          <span class="label"><span data-i18n="textGap"></span> <b id="tgVal">21</b>px</span>
+          <input type="range" id="textGap" min="0" max="120" step="1" value="21">
+        </label>
+      </div>
+      <p class="note spacing-note" data-i18n="spacingNote"></p>
+      <div class="row">
+        <label class="field grow">
+          <span class="label"><span data-i18n="qrSize"></span> <b id="qsVal">320</b>px</span>
           <input type="range" id="qrSize" min="160" max="640" step="8" value="320">
         </label>
         <label class="field grow">
-          <span class="label">导出倍率</span>
+          <span class="label" data-i18n="exportScale"></span>
           <select id="exportScale">
-            <option value="1">1×（跟随尺寸）</option>
-            <option value="2" selected>2×</option>
-            <option value="3">3×</option>
-            <option value="4">4×</option>
+            <option value="1" data-i18n="scale.1"></option>
+            <option value="2" selected data-i18n="scale.2"></option>
+            <option value="3" data-i18n="scale.3"></option>
+            <option value="4" data-i18n="scale.4"></option>
           </select>
         </label>
       </div>
-      <label class="check"><input type="checkbox" id="transparentBg"> 导出 PNG 时透明背景（不建议，可能影响扫描）</label>
+      <label class="check"><input type="checkbox" id="transparentBg"> <span data-i18n="transparentBg"></span></label>
     </div>
   </section>
 
@@ -226,7 +238,7 @@
   <section class="stage">
     <div class="card preview-card">
       <div class="preview-head">
-        <h2>实时预览</h2>
+        <h2 data-i18n="h.preview"></h2>
         <div class="preview-meta" id="previewMeta"></div>
       </div>
       <div class="canvas-wrap"><canvas id="preview"></canvas></div>
@@ -234,22 +246,22 @@
 
     <div class="card">
       <div class="preview-head">
-        <h2>可扫性体检 <em>（页面内置解码器实测）</em></h2>
-        <button id="btnAutoFix" class="primary sm">自动优化到可扫描</button>
+        <h2><span data-i18n="h.check"></span> <em data-i18n="checkNote"></em></h2>
+        <button id="btnAutoFix" class="primary sm" data-i18n="autoFix"></button>
       </div>
       <ul class="checks" id="checks"></ul>
       <p class="note" id="pdfNote" hidden></p>
     </div>
 
     <div class="card">
-      <h2>导出</h2>
+      <h2 data-i18n="h.export"></h2>
       <div class="row wrap">
-        <button id="btnPng" class="primary">下载 PNG</button>
-        <button id="btnSvg" class="primary">下载 SVG（矢量）</button>
-        <button id="btnPdf" class="primary">下载 PDF（矢量码点）</button>
-        <button id="btnCopy" class="ghost">复制 PNG 到剪贴板</button>
+        <button id="btnPng" class="primary" data-i18n="btnPng"></button>
+        <button id="btnSvg" class="primary" data-i18n="btnSvg"></button>
+        <button id="btnPdf" class="primary" data-i18n="btnPdf"></button>
+        <button id="btnCopy" class="ghost" data-i18n="btnCopy"></button>
       </div>
-      <p class="note">SVG / PDF 的码点为真矢量，适合印刷与放大；<span id="vectorNote"></span></p>
+      <p class="note"><span data-i18n="exportNote"></span><span id="vectorNote"></span></p>
     </div>
   </section>
 </main>
@@ -257,18 +269,17 @@
 <section class="cloud-wrap">
   <div class="card cloud-card">
     <div class="preview-head">
-      <h2>云端保存 <em id="cloudCount"></em></h2>
+      <h2><span data-i18n="h.cloud"></span> <em id="cloudCount"></em></h2>
       <div class="cloud-head-actions">
-        <button id="btnRefreshCloud" class="ghost sm">刷新</button>
-        <button id="btnSaveCloud" class="primary sm">保存到云端</button>
+        <button id="btnRefreshCloud" class="ghost sm" data-i18n="refresh"></button>
+        <button id="btnSaveCloud" class="primary sm" data-i18n="saveCloud"></button>
       </div>
     </div>
-    <p class="note">把当前二维码的 PNG 文件连同全部参数一起存到云端，最多 <b>20</b> 个；随时载入继续编辑，或直接取回原文件。</p>
+    <p class="note" id="cloudNote"></p>
     <p class="note cloud-status" id="cloudStatus" hidden></p>
     <div id="cloudList" class="cloud-list"></div>
   </div>
 </section>
-</main>
 
 <div id="toast" class="toast" hidden></div>
 

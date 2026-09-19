@@ -23,15 +23,32 @@ function toast(msg, ms) {
 /* ---------------------------------------------------------------- 控件绑定 */
 function buildFontSelect() {
   const sel = $('fontFamily');
-  sel.innerHTML = FONTS.map(f => `<option value="${f.id}">${f.label}</option>`).join('');
+  sel.innerHTML = FONTS.map(f => `<option value="${f.id}">${fontLabel(f)}</option>`).join('');
   sel.value = state.fontId;
 }
 function buildVersionSelect() {
   const sel = $('version');
-  let html = '<option value="0">自动</option>';
-  for (let v = 1; v <= 40; v++) html += `<option value="${v}">v${v}（${v * 4 + 17} 模块）</option>`;
+  let html = `<option value="0">${t('versionAuto')}</option>`;
+  for (let v = 1; v <= 40; v++) html += `<option value="${v}">${t('versionItem', { v, n: v * 4 + 17 })}</option>`;
   sel.innerHTML = html;
-  sel.value = '0';
+  sel.value = String(state.version || 0);
+}
+function buildLangSelect() {
+  const sel = $('langSel');
+  sel.innerHTML = LANGS.map(l => `<option value="${l.id}">${l.label}</option>`).join('');
+  sel.value = LANG;
+  sel.onchange = () => { setLang(sel.value); applyLang(); };
+}
+/** 切换语言：静态文案 + 所有下拉框 + 预览/体检/云列表都要重刷 */
+function applyLang() {
+  buildLangSelect();
+  buildFontSelect();
+  buildVersionSelect();
+  applyStaticText();
+  $('cloudNote').innerHTML = t('cloudNote');
+  syncUI();
+  render();
+  cloudRefresh(true);
 }
 function syncUI() {
   const set = (id, v) => { const el = $(id); if (el) el.value = v; };
@@ -58,6 +75,8 @@ function syncUI() {
   set('cardColor', state.cardColor);
   set('cardRadius', state.cardRadius);
   set('cardPad', state.cardPad);
+  set('imagePad', state.imagePad);
+  set('textGap', state.textGap);
   set('qrSize', state.qrSize);
   set('exportScale', state.exportScale);
   $('transparentBg').checked = state.transparentBg;
@@ -75,17 +94,11 @@ function updateSliderLabels() {
   $('lhXVal').textContent = (+state.lineHeight).toFixed(2);
   $('crVal').textContent = state.cardRadius;
   $('cpVal').textContent = state.cardPad;
+  $('ipVal').textContent = state.imagePad;
+  $('tgVal').textContent = state.textGap;
   $('qsVal').textContent = state.qrSize;
   const hint = $('shapeHint');
-  if (hint) {
-    hint.textContent = state.logoShape === 'circle'
-      ? '取宽高较小值作正方形，居中裁切'
-      : state.logoShape === 'square'
-        ? '取宽高较小值作正方形，图片居中留白'
-        : state.logoShape === 'none'
-          ? '底板直角，跟随图片实际比例'
-          : '底板圆角，贴住图片实际比例';
-  }
+  if (hint) hint.textContent = t('shapeHint.' + (state.logoShape || 'round'));
 }
 function bindInputs() {
   const bind = (id, key, fn) => {
@@ -124,6 +137,8 @@ function bindInputs() {
   bind('cardColor', 'cardColor');
   bind('cardRadius', 'cardRadius', v => Math.max(0, Math.min(80, v)));
   bind('cardPad', 'cardPad', v => Math.max(0, Math.min(80, v)));
+  bind('imagePad', 'imagePad', v => Math.max(0, Math.min(80, v)));
+  bind('textGap', 'textGap', v => Math.max(0, Math.min(120, v)));
   bind('qrSize', 'qrSize', v => Math.max(160, Math.min(640, v)));
   bind('exportScale', 'exportScale', v => v || 2);
   bind('transparentBg', 'transparentBg');
@@ -189,15 +204,15 @@ function bindInputs() {
     state.logoImg = null; state.logoSrc = null;
     $('logoThumb').hidden = true; $('logoThumb').src = ''; $('logoUrl').value = '';
     syncUI(); render();
-    toast('已重置');
+    toast(t('toast.reset'));
   });
   $('btnPresetLight').addEventListener('click', () => {
     Object.assign(state, { fgColor: '#111827', bgColor: '#ffffff', cardColor: '#ffffff', textColor: '#111827', dotStyle: 'square', transparentBg: false });
-    syncUI(); render(); toast('浅色模板');
+    syncUI(); render(); toast(t('toast.light'));
   });
   $('btnPresetDark').addEventListener('click', () => {
     Object.assign(state, { fgColor: '#ffffff', bgColor: '#0b1220', cardColor: '#0b1220', textColor: '#f8fafc', dotStyle: 'square' });
-    syncUI(); render(); toast('深色模板（反色码，建议先看体检结果）');
+    syncUI(); render(); toast(t('toast.dark'));
   });
 
   $('btnPng').addEventListener('click', exportPng);
@@ -220,7 +235,7 @@ function loadLogoUrl() {
   const img = new Image();
   img.crossOrigin = 'anonymous';
   img.onload = () => setLogo(url, img);
-  img.onerror = () => toast('图片加载失败，或该站点不允许跨域读取；请先下载再上传本地文件', 4200);
+  img.onerror = () => toast(t('toast.imgUrlFail'), 4200);
   img.src = url;
 }
 function setLogo(src, preloaded) {
@@ -238,10 +253,10 @@ function setLogo(src, preloaded) {
       state._logoAdjusted = true;
     }
     syncUI(); render();
-    toast('Logo 已载入');
+    toast(t('toast.logoLoaded'));
   };
   if (preloaded) finish(preloaded);
-  else { const img = new Image(); img.onload = () => finish(img); img.onerror = () => toast('图片解析失败'); img.src = src; }
+  else { const img = new Image(); img.onload = () => finish(img); img.onerror = () => toast(t('toast.imgParseFail')); img.src = src; }
 }
 
 /* ------------------------------------------------------------------ 渲染 */
@@ -255,16 +270,17 @@ function render() {
   lastResult = res;
   const cv = $('preview');
   if (!res.ok) {
+    const msg = t(res.error || 'toast.contentTooLong');
     const ctx = cv.getContext('2d');
     cv.width = 420; cv.height = 160;
     ctx.clearRect(0, 0, cv.width, cv.height);
     ctx.fillStyle = '#fdecea'; ctx.fillRect(0, 0, cv.width, cv.height);
     ctx.fillStyle = '#b42318'; ctx.font = '14px -apple-system, sans-serif';
-    ctx.fillText(res.error, 18, 60);
+    ctx.fillText(msg, 18, 60);
     ctx.font = '12px -apple-system, sans-serif';
-    ctx.fillText('提示：二维码容量有限，长文本请改用短链接。', 18, 92);
+    ctx.fillText(t('toast.capacityHint'), 18, 92);
     $('previewMeta').textContent = '';
-    $('checks').innerHTML = `<li class="bad"><span class="ic">✕</span><span class="txt">${res.error}</span></li>`;
+    $('checks').innerHTML = `<li class="bad"><span class="ic">✕</span><span class="txt">${msg}</span></li>`;
     return;
   }
   previewScale = Math.min(2, window.devicePixelRatio || 1);
@@ -275,20 +291,19 @@ function render() {
   drawScene(ctx, res.scene, previewScale, state);
 
   const m = res.meta;
-  $('previewMeta').innerHTML =
-    `v${m.version} · ${m.n}×${m.n} 模块<br>导出 ${m.exportW}×${m.exportH}px · ${(m.exportMs).toFixed(1)}px/模块`;
+  $('previewMeta').innerHTML = t('meta.line', {
+    v: m.version, n: m.n, w: m.exportW, h: m.exportH, ms: m.exportMs.toFixed(1),
+  });
   runChecks(res);
   updatePdfNote();
 }
 function updatePdfNote() {
   const el = $('pdfNote');
-  const t = (state.title + ' ' + state.subtitle).trim();
-  const bytes = winAnsiBytes(t);
-  if (!t) { el.hidden = true; return; }
+  const txt = (state.title + ' ' + state.subtitle).trim();
+  const bytes = winAnsiBytes(txt);
+  if (!txt) { el.hidden = true; return; }
   el.hidden = false;
-  el.textContent = bytes
-    ? 'PDF 说明：文字将用 PDF 内置标准字体以真矢量形式嵌入（覆盖英/德/西/法/葡/北欧等拉丁语系）。'
-    : 'PDF 说明：当前文字含 PDF 标准字体不支持的字符（如中文/西里尔文），该行将作为高清位图嵌入；需要完全矢量中文字，请用 SVG 导出。';
+  el.textContent = bytes ? t('pdfNote.vector') : t('pdfNote.bitmap');
 }
 
 /* ------------------------------------------------------------------ 体检 */
@@ -300,11 +315,11 @@ function updatePdfNote() {
  *  只测单一分辨率会产生假警报，所以任一档通过就算通过。 */
 function decodeCheck(st) {
   const res = buildScene(st, { includeCaption: false });
-  if (!res.ok) return { ok: false, reason: res.error };
+  if (!res.ok) return { ok: false, reason: t(res.error) };
   const total = res.meta.total;
   const expect = new TextEncoder().encode(st.content);
   const trial = Object.assign({}, st, { transparentBg: false });
-  let lastReason = '未识别到二维码';
+  let lastReason = t('decode.fail');
   let tried = 0;
   for (const pxPerModule of [10, 12, 8, 14, 6]) {
     const scale = Math.min(10, Math.max(1, (pxPerModule * total) / st.qrSize));
@@ -313,76 +328,80 @@ function decodeCheck(st) {
     const data = cv.getContext('2d').getImageData(0, 0, cv.width, cv.height).data;
     let out = null;
     try { out = jsQR(data, cv.width, cv.height, { inversionAttempts: 'attemptBoth' }); }
-    catch (e) { lastReason = '解码器异常：' + e.message; continue; }
+    catch (e) { lastReason = t('decode.exception', { msg: e.message }); continue; }
     tried++;
     if (!out || !out.binaryData) continue;
     const got = out.binaryData;
-    if (got.length !== expect.length) { lastReason = `内容长度不符（${got.length} vs ${expect.length} 字节）`; continue; }
+    if (got.length !== expect.length) {
+      lastReason = t('decode.lenMismatch', { got: got.length, expect: expect.length });
+      continue;
+    }
     let same = true;
     for (let i = 0; i < expect.length; i++) if (expect[i] !== got[i]) { same = false; break; }
     if (same) return { ok: true, pxPerModule };
-    lastReason = '内容校验不一致';
+    lastReason = t('decode.mismatch');
   }
   return { ok: false, reason: lastReason, tried };
 }
 function runChecks(res) {
   const m = res.meta;
   const items = [];
+  const name = k => '<b>' + t(k) + '</b>';
 
   // 1) 模块精度
   const ms = m.exportMs;
   items.push(ms >= 4
-    ? { lv: 'ok', t: `<b>模块精度</b> ${ms.toFixed(1)}px/模块（导出 ${m.exportW}×${m.exportH}px）`, d: '打印与远距离扫描都安全' }
+    ? { lv: 'ok', t: `${name('chk.precision')} ${t('chk.precision.px', { ms: ms.toFixed(1) })}${t('chk.precision.suffix', { w: m.exportW, h: m.exportH })}`, d: t('chk.precision.ok') }
     : ms >= 3
-      ? { lv: 'warn', t: `<b>模块精度</b> ${ms.toFixed(1)}px/模块，偏小`, d: '建议提高「导出倍率」或加大二维码尺寸' }
-      : { lv: 'bad', t: `<b>模块精度</b> 仅 ${ms.toFixed(2)}px/模块`, d: '过小会导致扫描失败，请增大尺寸或提高倍率' });
+      ? { lv: 'warn', t: `${name('chk.precision')} ${t('chk.precision.px', { ms: ms.toFixed(1) })}${t('chk.precision.small')}`, d: t('chk.precision.warn') }
+      : { lv: 'bad', t: `${name('chk.precision')} ${t('chk.precision.px', { ms: ms.toFixed(2) })}`, d: t('chk.precision.bad') });
 
   // 2) 定位图案避让
   if (m.hasLogo) {
     items.push(m.clearanceOk
-      ? { lv: 'ok', t: '<b>定位图案避让</b> 通过', d: '三个角上的定位方块未被遮挡' }
-      : { lv: 'bad', t: '<b>定位图案避让</b> 失败', d: `Logo 框侵入了定位图案区域，请把版本提到 v${m.needV} 以上，或缩小 Logo` });
+      ? { lv: 'ok', t: name('chk.clear'), d: t('chk.clear.ok') }
+      : { lv: 'bad', t: name('chk.clear'), d: t('chk.clear.bad', { v: m.needV }) });
   }
 
   // 3) 遮挡面积
   if (m.hasLogo) {
     const c = m.coverPct;
     items.push(c < 9
-      ? { lv: 'ok', t: `<b>Logo 遮挡</b> 占矩阵面积 ${c.toFixed(1)}%`, d: '在 H 级容错的安全区间内' }
+      ? { lv: 'ok', t: `${name('chk.cover')} ${t('chk.cover.pre')}${c.toFixed(1)}%`, d: t('chk.cover.ok') }
       : c < 14
-        ? { lv: 'warn', t: `<b>Logo 遮挡</b> 占 ${c.toFixed(1)}%，偏大`, d: '建议开 H 级容错并以体检结果为准' }
-        : { lv: 'bad', t: `<b>Logo 遮挡</b> 占 ${c.toFixed(1)}%，过大`, d: '已超出容错能力，请显著缩小 Logo' });
+        ? { lv: 'warn', t: `${name('chk.cover')} ${t('chk.cover.pre')}${c.toFixed(1)}%${t('chk.cover.warnSuffix')}`, d: t('chk.cover.warn') }
+        : { lv: 'bad', t: `${name('chk.cover')} ${t('chk.cover.pre')}${c.toFixed(1)}%${t('chk.cover.badSuffix')}`, d: t('chk.cover.bad') });
   }
 
   // 4) 实测解码（页面内置解码器，按导出样式重绘）
   const chk = decodeCheck(state);
   items.push(chk.ok
-    ? { lv: 'ok', t: '<b>实测解码</b> 通过', d: `按当前样式重绘（${chk.pxPerModule}px/模块）后，内置解码器完整读出了内容` }
-    : { lv: 'bad', t: '<b>实测解码</b> 未通过', d: (chk.reason || '') + '（已尝试多种采样倍率）。可点右上「自动优化到可扫描」' });
+    ? { lv: 'ok', t: name('chk.decode'), d: t('chk.decode.ok', { px: chk.pxPerModule }) }
+    : { lv: 'bad', t: name('chk.decode'), d: t('chk.decode.bad', { reason: chk.reason || '' }) });
 
   // 5) 静区
   items.push(m.quiet >= 4
-    ? { lv: 'ok', t: `<b>静区</b> ${m.quiet} 模块`, d: '符合标准（≥4）' }
-    : { lv: 'warn', t: `<b>静区</b> ${m.quiet} 模块，小于标准 4`, d: '周边预留越少，越容易被误识别' });
+    ? { lv: 'ok', t: `${name('chk.quiet')} ${m.quiet}`, d: t('chk.quiet.ok') }
+    : { lv: 'warn', t: `${name('chk.quiet')} ${m.quiet}`, d: t('chk.quiet.warn') });
 
   // 6) 容错级别
   if (m.hasLogo && state.ecc !== 'H') {
-    items.push({ lv: 'warn', t: `<b>容错级别</b> 当前 ${state.ecc}`, d: '带 Logo 时强烈建议使用 H（30%）' });
+    items.push({ lv: 'warn', t: `${name('chk.ecc')} ${state.ecc}`, d: t('chk.ecc.warn') });
   } else {
-    items.push({ lv: 'ok', t: `<b>容错级别</b> ${state.ecc}`, d: state.ecc === 'H' ? '最高容错' : '无 Logo 遮挡时可接受' });
+    items.push({ lv: 'ok', t: `${name('chk.ecc')} ${state.ecc}`, d: state.ecc === 'H' ? t('chk.ecc.highest') : t('chk.ecc.acceptable') });
   }
 
   // 7) 反色提示
   const lum = h => { const v = parseInt(h.slice(1), 16); return (((v >> 16) & 255) * 0.299 + ((v >> 8) & 255) * 0.587 + (v & 255) * 0.114); };
   if (lum(state.fgColor) > lum(state.bgColor)) {
-    items.push({ lv: 'warn', t: '<b>反色二维码</b>（浅码点 + 深底）', d: '现代手机可识别，但部分老设备/工业扫码枪不支持' });
+    items.push({ lv: 'warn', t: name('chk.invert'), d: t('chk.invert.desc') });
   }
   // 8) 装饰性模块样式
   if (state.dotStyle !== 'square') {
     items.push({
       lv: 'ok',
-      t: `<b>模块样式</b> ${state.dotStyle === 'dots' ? '圆点' : '圆角'}`,
-      d: '定位/时序/校正图案已强制保持实心，装饰只作用于数据模块——这是能被扫出来的前提',
+      t: `${name('chk.style')} ${state.dotStyle === 'dots' ? t('chk.style.dots') : t('chk.style.round')}`,
+      d: t('chk.style.desc'),
     });
   }
 
@@ -394,14 +413,14 @@ function runChecks(res) {
 /* -------------------------------------------------------------- 自动优化 */
 function autoFix() {
   const log = [];
-  if (state.ecc !== 'H') { state.ecc = 'H'; log.push('容错提到 H'); }
-  if (!state.content.trim()) { toast('请先填写二维码内容'); return; }
+  if (state.ecc !== 'H') { state.ecc = 'H'; log.push(t('fix.ecc')); }
+  if (!state.content.trim()) { toast(t('toast.emptyContent')); return; }
   let mode = 'version';
   let guard = 0;
   while (guard++ < 80) {
     const res = buildScene(state, {});
-    if (!res.ok) { toast(res.error, 3600); break; }
-    if (!res.meta.clearanceOk) { state.version = res.meta.needV; log.push('版本提到 v' + res.meta.needV); continue; }
+    if (!res.ok) { toast(t(res.error), 3600); break; }
+    if (!res.meta.clearanceOk) { state.version = res.meta.needV; log.push(t('fix.version', { v: res.meta.needV })); continue; }
     // 遮挡远超容错能力时，提高版本也救不回来，直接缩 Logo
     if (mode === 'version' && res.meta.coverPct > 18) { mode = 'logo'; continue; }
     const chk = decodeCheck(state);
@@ -410,20 +429,22 @@ function autoFix() {
       const cur = state.version || res.meta.version;
       if (cur >= 40 || cur - res.meta.version >= 8) { mode = 'logo'; continue; }
       state.version = cur + 1;
-      log.push('版本 v' + state.version);
+      log.push(t('fix.version2', { v: state.version }));
     } else if (mode === 'logo') {
       if (state.logoW <= 12 || state.logoH <= 12) { mode = 'plain'; continue; }
       state.logoW = Math.max(12, state.logoW - 2);
       state.logoH = Math.max(12, Math.min(state.logoH, state.logoW));
-      log.push('Logo 缩到 ' + state.logoW + '%');
+      log.push(t('fix.logo', { n: state.logoW }));
     } else {
-      if (state.dotStyle !== 'square') { state.dotStyle = 'square'; log.push('模块改回方块'); continue; }
+      if (state.dotStyle !== 'square') { state.dotStyle = 'square'; log.push(t('fix.style')); continue; }
       break;
     }
   }
   syncUI(); render();
   const done = decodeCheck(state);
-  toast(done.ok ? ('已优化：' + (log.length ? log.slice(-3).join(' → ') : '当前配置本就可用')) : '仍未能通过实测，请手动减小 Logo 或缩短内容', done.ok ? 2600 : 4200);
+  toast(done.ok
+    ? t('toast.optimizeOk', { log: log.length ? log.slice(-3).join(' → ') : t('toast.optimizeAlready') })
+    : t('toast.optimizeFail'), done.ok ? 2600 : 4200);
 }
 
 /* ------------------------------------------------------------------ 导出 */
@@ -440,47 +461,50 @@ function download(blob, name) {
 }
 function exportPng() {
   const res = buildScene(state, {});
-  if (!res.ok) return toast(res.error, 3600);
+  if (!res.ok) return toast(t(res.error), 3600);
   const cv = renderToCanvas(res.scene, state, state.exportScale);
   cv.toBlob(b => {
-    if (!b) return toast('导出失败');
+    if (!b) return toast(t('toast.exportFail'));
     download(b, `qrcode-${stamp()}.png`);
-    toast(`已导出 PNG ${cv.width}×${cv.height}`);
+    toast(t('toast.exportedPng', { w: cv.width, h: cv.height }));
   }, 'image/png');
 }
 function exportSvg() {
   const res = buildScene(state, {});
-  if (!res.ok) return toast(res.error, 3600);
+  if (!res.ok) return toast(t(res.error), 3600);
   const svg = toSVG(res.scene, state);
   download(new Blob([svg], { type: 'image/svg+xml;charset=utf-8' }), `qrcode-${stamp()}.svg`);
-  toast('已导出 SVG（全矢量）');
+  toast(t('toast.exportedSvg'));
 }
 function exportPdf() {
   const res = buildScene(state, {});
-  if (!res.ok) return toast(res.error, 3600);
+  if (!res.ok) return toast(t(res.error), 3600);
   try {
     const bytes = toPDF(res.scene, state);
     download(new Blob([bytes], { type: 'application/pdf' }), `qrcode-${stamp()}.pdf`);
-    toast('已导出 PDF');
-  } catch (e) { toast('PDF 生成失败：' + e.message, 4000); }
+    toast(t('toast.exportedPdf'));
+  } catch (e) { toast(t('toast.pdfFail', { msg: e.message }), 4000); }
 }
 function copyPng() {
   const res = buildScene(state, {});
-  if (!res.ok) return toast(res.error, 3600);
+  if (!res.ok) return toast(t(res.error), 3600);
   const cv = renderToCanvas(res.scene, state, state.exportScale);
   cv.toBlob(async b => {
     try {
       await navigator.clipboard.write([new ClipboardItem({ 'image/png': b })]);
-      toast('PNG 已复制到剪贴板');
-    } catch (e) { toast('复制失败，浏览器可能未授权剪贴板权限', 3200); }
+      toast(t('toast.copied'));
+    } catch (e) { toast(t('toast.copyFail'), 3200); }
   }, 'image/png');
 }
 
 /* -------------------------------------------------------------------- 启动 */
 function init() {
+  buildLangSelect();
   buildFontSelect();
   buildVersionSelect();
+  applyStaticText();
   $('appVersion').textContent = 'v' + APP_VERSION;
+  $('cloudNote').innerHTML = t('cloudNote');
   syncUI();
   bindInputs();
   $('fontSample').style.fontFamily = fontById(state.fontId).css;
