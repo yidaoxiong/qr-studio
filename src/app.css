@@ -143,6 +143,7 @@ button {
 }
 button:hover { background: var(--surface); }
 button:active { transform: translateY(1px); }
+button:disabled { opacity: .45; cursor: default; pointer-events: none; }
 button.primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
 button.primary:hover { background: var(--accent-hover); }
 button.ghost { background: var(--panel); }

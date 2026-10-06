@@ -10,6 +10,20 @@ let cloudItems = [];
 let cloudBusy = false;
 let cloudLoadedId = null; // 当前预览对应云端哪一条
 
+/** 忙的时候把云端按钮置灰 —— 免得"点了没反应"（之前 delete 的 busy 检查写在
+ *  confirm 之后，保存还没完就点删除会白问一句然后静默返回） */
+function setCloudBusy(v) {
+  cloudBusy = !!v;
+  for (const id of ['btnSaveCloud', 'btnRefreshCloud']) {
+    const el = $(id);
+    if (el) el.disabled = cloudBusy;
+  }
+  const box = $('cloudList');
+  if (box && cloudBusy) {
+    box.querySelectorAll('button').forEach(b => { b.disabled = true; });
+  }
+}
+
 /* ------------------------------------------------------------ 小工具 */
 function cloudRecipe(st) {
   const r = {};
@@ -65,13 +79,27 @@ async function cloudFetch(path, opts) {
 }
 
 /* ------------------------------------------------------------ 保存 */
+/** 从二维码内容里取一个人能看懂的条目名。
+ *  vCard / MECARD 要取 FN，否则会存进去一整段带换行的原始数据。 */
+function deriveEntryName() {
+  const c = String(state.content || '');
+  if (/^(BEGIN:VCARD|MECARD:)/m.test(c)) {
+    const fn = c.match(/^FN:(.*)$/m) || c.match(/^MECARD:N:([^;]*)/m);
+    if (fn) {
+      const s = fn[1].replace(/\\[;,n\\]/g, ' ').replace(/\s+/g, ' ').trim();
+      if (s) return s.slice(0, 40);
+    }
+  }
+  return (state.title || c || t('cloud.unnamed'))
+    .replace(/[\r\n]+/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 40);
+}
+
 async function cloudSave() {
   if (cloudBusy) return;
   const res = buildScene(state, {});
-  if (!res.ok) return toast(res.error, 3600);
+  if (!res.ok) return toast(t(res.error), 3600);
 
-  const name = (cloudLoadedId ? (state._cloudName || '') : '') ||
-    (state.title || state.content || t('cloud.unnamed')).slice(0, 40);
+  const name = (cloudLoadedId ? (state._cloudName || '') : '') || deriveEntryName();
 
   // 覆盖确认：已从云端载入过，就直接问要不要覆盖
   let targetId = null;
@@ -80,7 +108,7 @@ async function cloudSave() {
     if (yes) targetId = cloudLoadedId;
   }
 
-  cloudBusy = true;
+  setCloudBusy(true);
   setCloudStatus(t('cloud.saving'));
   try {
     const cv = renderToCanvas(res.scene, state, state.exportScale);
@@ -127,7 +155,7 @@ async function cloudSave() {
       toast(t('cloud.saveFail', { msg }), 4200);
     }
   } finally {
-    cloudBusy = false;
+    setCloudBusy(false);
     setCloudStatus('');
   }
 }
@@ -185,7 +213,7 @@ function escapeHtml(s) {
 /* ------------------------------------------------------- 载入 / 下载 / 删除 */
 async function cloudLoad(id) {
   if (cloudBusy) return;
-  cloudBusy = true;
+  setCloudBusy(true);
   setCloudStatus(t('cloud.loadingOne'));
   try {
     const out = await cloudFetch(CLOUD_API + '/' + id);
@@ -195,7 +223,7 @@ async function cloudLoad(id) {
   } catch (e) {
     toast(t('cloud.loadFail', { msg: String(e.message || e) }), 4000);
   } finally {
-    cloudBusy = false;
+    setCloudBusy(false);
     setCloudStatus('');
   }
 }
@@ -238,10 +266,11 @@ async function cloudDownloadPng(id) {
   }
 }
 async function cloudDelete(id) {
+  // 忙的时候先问会让用户以为没反应 —— 先挡掉再问
+  if (cloudBusy) return;
   const it = cloudItems.find(x => x.id === id);
   if (!window.confirm(t('cloud.confirmDelete', { name: it ? it.name : id }))) return;
-  if (cloudBusy) return;
-  cloudBusy = true;
+  setCloudBusy(true);
   setCloudStatus(t('cloud.deleting'));
   try {
     await cloudFetch(CLOUD_API + '/' + id, { method: 'DELETE' });
@@ -251,7 +280,7 @@ async function cloudDelete(id) {
   } catch (e) {
     toast(t('cloud.delFail', { msg: String(e.message || e) }), 4000);
   } finally {
-    cloudBusy = false;
+    setCloudBusy(false);
     setCloudStatus('');
   }
 }
