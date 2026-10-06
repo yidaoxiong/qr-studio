@@ -33,17 +33,42 @@ function vcPhoneDigits(v) {
   const plus = s.replace(/[^\d]/g, '').replace(/^0+/, '');
   return /\+\d[\d\s\-()]{6,}/.test(s) ? '+' + plus : plus;
 }
+
+/* 姓名顺序：中日韩习惯姓在前，拉丁字母习惯名在前（Ray 李 / Ray Li 都对）。
+   注意 vCard 的 N 字段永远是「姓;名」，那是规范强制的，跟显示顺序无关。 */
+const CJK_RE = /[぀-ヿ㐀-䶿一-鿿가-힯]/;
+function displayName(last, first) {
+  if (!last) return first || '';
+  if (!first) return last;
+  return CJK_RE.test(last + first) ? last + ' ' + first : first + ' ' + last;
+}
 /** WhatsApp 官方 click-to-chat 链接：https://wa.me/<国家码+号码> */
 function waLink(phone) {
   const d = vcPhoneDigits(phone);
   return d ? 'https://wa.me/' + d.replace(/^\+/, '') : '';
 }
-/** 社交账号的规范链接 */
+/** 社交账号的规范链接。
+ *  坑：LinkedIn 大家习惯只填 `in/rayli` 或直接填整条网址，Instagram 会带 @，
+ *  光靠「去掉协议头再补 https://」会生成 https://in/rayli 这种废链接。 */
 const SOCIAL_DEFS = [
-  { key: 'whatsapp', type: 'whatsapp', field: 'phone', fromPhone: true, ph: 'https://wa.me/8613800000000' },
-  { key: 'instagram', type: 'instagram', field: 'instagram', ph: 'https://instagram.com/username' },
-  { key: 'linkedin', type: 'linkedin', field: 'linkedin', ph: 'https://linkedin.com/in/username' },
-  { key: 'x', type: 'twitter', field: 'x', ph: 'https://x.com/username' },
+  { key: 'whatsapp', type: 'whatsapp', field: 'phone', fromPhone: true },
+  {
+    key: 'instagram', type: 'instagram', field: 'instagram',
+    link: u => (/^https?:\/\//i.test(u) ? u.replace(/\/+$/, '')
+      : 'https://www.instagram.com/' + u.replace(/^@/, '').replace(/^\/+/, '').replace(/\/+$/, '')),
+  },
+  {
+    key: 'linkedin', type: 'linkedin', field: 'linkedin',
+    // 允许填 username / in/username / company/xxx / 完整 URL；
+    // 只填一个词时默认是个人主页 in/xxx（填错会变成 /rayli 这种废链接）
+    link: u => (/^https?:\/\//i.test(u) ? u.replace(/\/+$/, '')
+      : 'https://www.linkedin.com/' + (u.indexOf('/') >= 0 ? '' : 'in/') + u.replace(/^\/+/, '').replace(/\/+$/, '')),
+  },
+  {
+    key: 'x', type: 'twitter', field: 'x',
+    link: u => (/^https?:\/\//i.test(u) ? u.replace(/\/+$/, '')
+      : 'https://x.com/' + u.replace(/^@/, '').replace(/^\/+/, '').replace(/\/+$/, '')),
+  },
 ];
 
 /**
@@ -61,7 +86,7 @@ function buildVCard(f, o) {
 
   const last = vcComp(f.lastName).trim();
   const first = vcComp(f.firstName).trim();
-  const full = [f.lastName, f.firstName].filter(Boolean).join(' ').trim() || vcText(f.nickname || '');
+  const full = displayName(f.lastName, f.firstName) || vcText(f.nickname || '');
   const phoneRaw = (f.phone || '').trim();
   const wechat = (f.wechat || '').trim();
 
@@ -69,10 +94,11 @@ function buildVCard(f, o) {
   const socials = [];
   for (const d of SOCIAL_DEFS) {
     let url = '';
-    if (d.fromPhone) url = waLink(phoneRaw);
-    else {
-      const v = (f[d.field] || '').trim().replace(/^https?:\/\//i, '').replace(/\/+$/, '');
-      if (v) url = 'https://' + v.replace(/^www\./, '');
+    if (d.fromPhone) {
+      url = waLink(phoneRaw);
+    } else {
+      const raw = (f[d.field] || '').trim();
+      if (raw) url = d.link(raw);
     }
     if (url) socials.push({ type: d.type, url: url });
   }
@@ -83,7 +109,8 @@ function buildVCard(f, o) {
    * 所以这里绝不能用 vcText/vcComp —— 那会把逗号和分号转义成 \; \, ，反而解析错。
    * 字段用 ; 分隔，整条记录以 ; 结尾。 */
   if (ver === 'mecard') {
-    const m = ['MECARD:N:' + full];
+    // MECARD 的 N 段是「姓,名」（逗号），和 vCard 的分号不一样
+    const m = ['MECARD:N:' + [f.lastName, f.firstName].filter(Boolean).join(',')];
     if (f.org) m.push('ORG:' + f.org);
     if (phoneRaw) m.push('TEL:' + vcPhoneDigits(phoneRaw));
     if (f.email) m.push('EMAIL:' + f.email);
@@ -114,7 +141,9 @@ function buildVCard(f, o) {
   if (phoneRaw) add('TEL;TYPE=CELL,VOICE:' + vcText(phoneRaw));
   if (f.email) add('EMAIL;TYPE=WORK:' + vcText(f.email));
   if (f.address || f.city || f.region || f.postal || f.country) {
-    add('ADR;TYPE=WORK:;' + ['', '', f.address, f.city, f.region, f.postal, f.country].map(vcComp).join(';'));
+    // ADR 值固定 7 段：邮政信箱;扩展地址;街道;城市;省州;邮编;国家
+    // ⚠ 前面不要再多打一个分号 —— 多一个就把街道挪到"城市"槽，整条地址整体错位一格
+    add('ADR;TYPE=WORK:' + ['', '', f.address, f.city, f.region, f.postal, f.country].map(vcComp).join(';'));
   }
   if (f.bday) add('BDAY:' + vcText(f.bday.replace(/[^\d-]/g, '')));
 

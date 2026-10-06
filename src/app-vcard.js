@@ -10,7 +10,8 @@
 const VC_FIELDS = {
   lastName: 'vcLast', firstName: 'vcFirst', org: 'vcOrg', title: 'vcTitle',
   phone: 'vcPhone', email: 'vcEmail', url: 'vcUrl', wechat: 'vcWechat',
-  address: 'vcAddr', city: 'vcCity', region: 'vcRegion', country: 'vcCountry',
+  address: 'vcAddr', city: 'vcCity', region: 'vcRegion', postal: 'vcPostal',
+  country: 'vcCountry',
   instagram: 'vcInstagram', linkedin: 'vcLinkedin', x: 'vcX', note: 'vcNote',
 };
 
