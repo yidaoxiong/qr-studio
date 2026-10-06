@@ -25,7 +25,9 @@ const css = read('src/app.css');
 const app = [
   read('src/i18n.js'),     // 必须最先：LANG / t() 供后面所有模块使用
   read('src/app-core.js'),
+  read('src/vcard.js'),    // 名片格式生成，与渲染无关
   read('src/app-ui.js'),
+  read('src/app-vcard.js'),// 名片表单交互
   read('src/app-cloud.js'),
   read('src/app-boot.js'),
 ].join('\n');

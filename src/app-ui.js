@@ -220,6 +220,7 @@ function bindInputs() {
   $('btnPdf').addEventListener('click', exportPdf);
   $('btnCopy').addEventListener('click', copyPng);
   $('btnAutoFix').addEventListener('click', autoFix);
+  bindVCard();
   bindCloud();
 }
 

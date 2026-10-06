@@ -55,6 +55,114 @@
       </div>
     </div>
 
+    <div class="card vcard-card">
+      <h2 data-i18n="h.vcard"></h2>
+      <div class="row">
+        <label class="field grow">
+          <span class="label" data-i18n="vc.last"></span>
+          <input type="text" id="vcLast" data-i18n-ph="vc.lastPh">
+        </label>
+        <label class="field grow">
+          <span class="label" data-i18n="vc.first"></span>
+          <input type="text" id="vcFirst" data-i18n-ph="vc.firstPh">
+        </label>
+      </div>
+      <div class="row">
+        <label class="field grow">
+          <span class="label" data-i18n="vc.org"></span>
+          <input type="text" id="vcOrg" data-i18n-ph="vc.orgPh">
+        </label>
+        <label class="field grow">
+          <span class="label" data-i18n="vc.title"></span>
+          <input type="text" id="vcTitle" data-i18n-ph="vc.titlePh">
+        </label>
+      </div>
+      <div class="row">
+        <label class="field grow">
+          <span class="label" data-i18n="vc.phone"></span>
+          <input type="text" id="vcPhone" data-i18n-ph="vc.phonePh">
+        </label>
+        <label class="field grow">
+          <span class="label" data-i18n="vc.email"></span>
+          <input type="text" id="vcEmail" data-i18n-ph="vc.emailPh">
+        </label>
+      </div>
+      <div class="row">
+        <label class="field grow">
+          <span class="label" data-i18n="vc.url"></span>
+          <input type="text" id="vcUrl" data-i18n-ph="vc.urlPh">
+        </label>
+        <label class="field grow">
+          <span class="label" data-i18n="vc.wechat"></span>
+          <input type="text" id="vcWechat" data-i18n-ph="vc.wechatPh">
+        </label>
+      </div>
+      <div class="row">
+        <label class="field grow">
+          <span class="label" data-i18n="vc.addr"></span>
+          <input type="text" id="vcAddr">
+        </label>
+        <label class="field grow">
+          <span class="label" data-i18n="vc.city"></span>
+          <input type="text" id="vcCity">
+        </label>
+      </div>
+      <div class="row">
+        <label class="field grow">
+          <span class="label" data-i18n="vc.region"></span>
+          <input type="text" id="vcRegion">
+        </label>
+        <label class="field grow">
+          <span class="label" data-i18n="vc.country"></span>
+          <input type="text" id="vcCountry">
+        </label>
+      </div>
+      <div class="row">
+        <label class="field grow">
+          <span class="label">Instagram</span>
+          <input type="text" id="vcInstagram" placeholder="username">
+        </label>
+        <label class="field grow">
+          <span class="label">LinkedIn</span>
+          <input type="text" id="vcLinkedin" placeholder="in/username">
+        </label>
+        <label class="field grow">
+          <span class="label">X</span>
+          <input type="text" id="vcX" placeholder="username">
+        </label>
+      </div>
+      <div class="row">
+        <label class="field grow">
+          <span class="label" data-i18n="vc.note"></span>
+          <input type="text" id="vcNote">
+        </label>
+      </div>
+      <div class="row">
+        <label class="field grow">
+          <span class="label" data-i18n="vc.version"></span>
+          <select id="vcVersion">
+            <option value="3.0" data-i18n="vc.ver30"></option>
+            <option value="4.0" data-i18n="vc.ver40"></option>
+            <option value="mecard" data-i18n="vc.verMecard"></option>
+          </select>
+        </label>
+        <label class="field grow">
+          <span class="label" data-i18n="vc.socialMode"></span>
+          <select id="vcSocialMode">
+            <option value="url" data-i18n="vc.modeUrl"></option>
+            <option value="profile" data-i18n="vc.modeProfile"></option>
+          </select>
+        </label>
+      </div>
+      <p class="note" data-i18n-html="vc.hint"></p>
+      <div class="row wrap">
+        <button id="btnVcApply" class="primary" data-i18n="vc.apply"></button>
+        <button id="btnVcFile" class="ghost" data-i18n="vc.download"></button>
+        <button id="btnVcClear" class="ghost" data-i18n="vc.clear"></button>
+      </div>
+      <p class="note" id="vcInfo"></p>
+    </div>
+
     <div class="card">
       <h2 data-i18n="h.logo"></h2>
       <div id="drop" class="drop">
